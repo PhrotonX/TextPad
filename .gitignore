@@ -3,3 +3,6 @@ bin/Debug/TextPad.exe
 *.exe
 TextPad.depend
 verHistory.txt
+TextPad.cbp
+obj/Debug/textpad.res
+TextPad.layout
