@@ -47,7 +47,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 PostMessage(hwnd, WM_CLOSE, 0, 0);
                 break;
             case ID_HELP_ABOUT:
-                MessageBox(hwnd, "TextPad by Phroton, Version 0.1.0.1-alpha build 19", "About", MB_OK | MB_ICONINFORMATION);
+                MessageBox(hwnd, "TextPad by Phroton, Version 0.1.0.1-alpha build 22", "About", MB_OK | MB_ICONINFORMATION);
                 break;
         }
 

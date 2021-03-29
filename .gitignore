@@ -1,0 +1,5 @@
+
+bin/Debug/TextPad.exe
+*.exe
+TextPad.depend
+verHistory.txt

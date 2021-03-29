@@ -4,8 +4,8 @@
 #define VER_MAJORV                              "0"
 #define VER_MINORV                              "1"
 #define VER_PATCH                               "0"
-#define VER_DEV                                 "1-alpha"
-#define VER_BUILD                               "19"
+#define VER_DEV                                 "2-alpha"
+#define VER_BUILD                               "22"
 
 #define IDR_MENU1                               100
 #define ID_FILE_NEW                             40000
