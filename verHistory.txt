@@ -1,0 +1,8 @@
+TextPad
+Dev: Phroton
+Created in March 29, 2021
+
+Version 0.1.0.1 alpha build,
+-Added basic code & resources
+-Non functional menu bar except Exit button
+-Command console exists
