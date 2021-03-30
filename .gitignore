@@ -10,3 +10,6 @@ TextPad.layout
 *.depend
 *.exe
 *.exe
+*.o
+*.exe
+git rm --cached

@@ -188,7 +188,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_)
                 break;
             case ID_HELP_ABOUT:
-                MessageBox(hwnd, "TextPad by Phroton, Version 0.1.0.2-alpha build 35", "About", MB_OK | MB_ICONINFORMATION);
+                MessageBox(hwnd, "TextPad by Phroton, Version 0.1.0.2-alpha build 36", "About", MB_OK | MB_ICONINFORMATION);
                 break;
             case ID_HELP_VIEWONGITHUB: {
                 char linkGithub[35] = "https://github.com/PhrotonX/TextPad";
