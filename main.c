@@ -5,6 +5,8 @@
 const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT     101
 
+int build = 39;
+
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
     HANDLE hFile;
@@ -188,7 +190,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_)
                 break;
             case ID_HELP_ABOUT:
-                MessageBox(hwnd, "TextPad by Phroton, Version 0.1.0.2-alpha build 36", "About", MB_OK | MB_ICONINFORMATION);
+                {
+                    char buffer[0xff];
+                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.2-alpha build %d\n", build);
+                    MessageBox(NULL, buffer, "About TextPad", MB_OK | MB_ICONINFORMATION);
+                }
+
                 break;
             case ID_HELP_VIEWONGITHUB: {
                 char linkGithub[35] = "https://github.com/PhrotonX/TextPad";

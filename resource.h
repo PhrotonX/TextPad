@@ -5,7 +5,6 @@
 #define VER_MINORV                              "1"
 #define VER_PATCH                               "0"
 #define VER_DEV                                 "2-alpha"
-#define VER_BUILD                               "36"
 
 #define IDR_MENU1                               100
 #define ID_FILE_NEW                             40000 //DONE
