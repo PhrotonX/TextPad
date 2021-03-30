@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1617004479 source:c:\users\cpasc\documents\c++\projects\textpad\textpad.rc
+1617011183 source:c:\users\cpasc\documents\c++\projects\textpad\textpad.rc
 	<windows.h>
 	<commctrl.h>
 	<richedit.h>
 	"resource.h"
 
-1617008293 c:\users\cpasc\documents\c++\projects\textpad\resource.h
+1617069248 c:\users\cpasc\documents\c++\projects\textpad\resource.h
 
 1617006299 source:c:\users\cpasc\documents\c++\projects\textpad\main.c
 	<windows.h>

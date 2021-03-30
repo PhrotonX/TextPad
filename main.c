@@ -1,5 +1,6 @@
 #include <windows.h>
 #include "resource.h"
+#include <stdio.h>
 const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT     101
 
@@ -46,9 +47,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_FILE_EXIT:
                 PostMessage(hwnd, WM_CLOSE, 0, 0);
                 break;
-            case ID_HELP_ABOUT:
-                MessageBox(hwnd, "TextPad by Phroton, Version 0.1.0.1-alpha build 22", "About", MB_OK | MB_ICONINFORMATION);
+            case ID_EDIT_CUT:
+                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_CUT, 0, 0);
                 break;
+            case ID_EDIT_COPY:
+                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_COPY, 0, 0);
+                break;
+            case ID_EDIT_PASTE:
+                break;
+            case ID_EDIT_UNDO:
+                break;
+            case ID_EDIT_REDO:
+                break;
+            case ID_HELP_ABOUT:
+                MessageBox(hwnd, "TextPad by Phroton, Version 0.1.0.1-alpha build 25", "About", MB_OK | MB_ICONINFORMATION);
+                break;
+            case ID_HELP_VIEWONGITHUB: {
+                char linkGithub[35] = "https://github.com/PhrotonX/TextPad";
+                ShellExecute(NULL, "open", linkGithub, NULL, NULL, SW_SHOWNORMAL);
+                break;
+            }
         }
 
         break;

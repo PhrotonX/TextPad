@@ -16,46 +16,48 @@
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDR_MENU1 MENU
 {
-    POPUP "File"
+    POPUP "&File"
     {
-        MENUITEM "New", ID_FILE_NEW
-        MENUITEM "Open", ID_FILE_OPEN
-        MENUITEM "Save", ID_FILE_SAVE
-        MENUITEM "Save as...", ID_FILE_SAVEAS
+        MENUITEM "&New", ID_FILE_NEW
+        MENUITEM "&Open", ID_FILE_OPEN
+        MENUITEM "&Save", ID_FILE_SAVE
+        MENUITEM "&Save as...", ID_FILE_SAVEAS
         MENUITEM SEPARATOR
-        MENUITEM "Exit", ID_FILE_EXIT
+        MENUITEM "E&xit", ID_FILE_EXIT
     }
-    POPUP "Edit"
+    POPUP "&Edit"
     {
-        MENUITEM "Cut", ID_EDIT_CUT
-        MENUITEM "Copy", ID_EDIT_COPY
-        MENUITEM "Paste", ID_EDIT_PASTE
-        MENUITEM "Select All", ID_EDIT_SELECTALL
-        MENUITEM "Deselect All", ID_EDIT_DESELECTALL
+        MENUITEM "&Undo", ID_EDIT_UNDO
+        MENUITEM "&Redo", ID_EDIT_REDO
+        MENUITEM "&Cut", ID_EDIT_CUT
+        MENUITEM "&Copy", ID_EDIT_COPY
+        MENUITEM "&Paste", ID_EDIT_PASTE
+        MENUITEM "&Select All", ID_EDIT_SELECTALL
+        MENUITEM "&Deselect All", ID_EDIT_DESELECTALL
     }
-    POPUP "View"
+    POPUP "&View"
     {
-        MENUITEM "Status Bar", ID_VIEW_STATUSBAR
-        MENUITEM "Word Wrap", ID_VIEW_WORDWRAP
-        MENUITEM "Toolbar", ID_VIEW_TOOLBAR
-        MENUITEM "Debug Window", ID_VIEW_DEBUGWINDOW
+        MENUITEM "&Status Bar", ID_VIEW_STATUSBAR
+        MENUITEM "&Word Wrap", ID_VIEW_WORDWRAP
+        MENUITEM "&Toolbar", ID_VIEW_TOOLBAR
+        MENUITEM "&Debug Window", ID_VIEW_DEBUGWINDOW
     }
-    POPUP "Format"
+    POPUP "&Format"
     {
-        MENUITEM "Font", ID_FORMAT_FONT
-        MENUITEM "Default Font", ID_FORMAT_DEFAULTFONT
+        MENUITEM "&Font", ID_FORMAT_FONT
+        MENUITEM "&Default Font", ID_FORMAT_DEFAULTFONT
         MENUITEM SEPARATOR
-        MENUITEM "Bold", ID_FONT_BOLD
-        MENUITEM "Italics", ID_FONT_ITALICS
-        MENUITEM "Underline", ID_FONT_UNDERLINE
-        MENUITEM "Strikethrough", ID_FONT_STRIKETHROUGH
+        MENUITEM "&Bold", ID_FONT_BOLD
+        MENUITEM "&Italics", ID_FONT_ITALICS
+        MENUITEM "&Underline", ID_FONT_UNDERLINE
+        MENUITEM "&Strikethrough", ID_FONT_STRIKETHROUGH
     }
-    POPUP "Help"
+    POPUP "&Help"
     {
-        MENUITEM "Get Help", ID_HELP_GETHELP
+        MENUITEM "&Get Help", ID_HELP_GETHELP
         MENUITEM SEPARATOR
-        MENUITEM "About", ID_HELP_ABOUT
-        MENUITEM "Check for Updates", ID_HELP_CHECKFORUPDATES
-        MENUITEM "View on GitHub", ID_HELP_VIEWONGITHUB
+        MENUITEM "&About", ID_HELP_ABOUT
+        MENUITEM "&Check for Updates", ID_HELP_CHECKFORUPDATES
+        MENUITEM "&View on GitHub", ID_HELP_VIEWONGITHUB
     }
 }
