@@ -13,3 +13,6 @@ TextPad.layout
 *.o
 *.exe
 git rm --cached
+TextPad.depend
+obj/Debug/main.o
+bin/Debug/TextPad.exe
