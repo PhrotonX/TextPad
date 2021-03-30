@@ -29,9 +29,11 @@ IDR_MENU1 MENU
     {
         MENUITEM "&Undo", ID_EDIT_UNDO
         MENUITEM "&Redo", ID_EDIT_REDO
+        MENUITEM SEPARATOR
         MENUITEM "&Cut", ID_EDIT_CUT
         MENUITEM "&Copy", ID_EDIT_COPY
         MENUITEM "&Paste", ID_EDIT_PASTE
+        MENUITEM SEPARATOR
         MENUITEM "&Select All", ID_EDIT_SELECTALL
         MENUITEM "&Deselect All", ID_EDIT_DESELECTALL
     }

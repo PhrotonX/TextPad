@@ -1,8 +1,119 @@
 #include <windows.h>
 #include "resource.h"
 #include <stdio.h>
+
 const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT     101
+
+BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
+{
+    HANDLE hFile;
+    BOOL bSuccess = FALSE;
+
+    hFile = CreateFile(pszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    if(hFile != INVALID_HANDLE_VALUE)
+    {
+        DWORD dwFileSize;
+
+        dwFileSize = GetFileSize(hFile, NULL);
+        if(dwFileSize != 0xFFFFFFFF)
+        {
+            LPSTR pszFileText;
+            pszFileText = GlobalAlloc(GPTR, dwFileSize + 1);
+
+            if(pszFileText != NULL)
+            {
+                DWORD dwRead;
+
+                if(ReadFile(hFile, pszFileText, dwFileSize, &dwRead, NULL))
+                   {
+                       pszFileText[dwFileSize] = 0;
+                       if(SetWindowText(hEdit, pszFileText))
+                            bSuccess = TRUE;
+                   }
+                   GlobalFree(pszFileText);
+            }
+        }
+    }
+}
+
+BOOL SaveTextFileFromEdit(HWND hEdit, LPCTSTR pszFileName)
+{
+    HANDLE hFile;
+    BOOL bSuccess = FALSE;
+
+    hFile = CreateFile(pszFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if(hFile != INVALID_HANDLE_VALUE)
+    {
+        DWORD dwTextLenght;
+        dwTextLenght = GetWindowTextLength(hEdit); //unicode
+
+        if(dwTextLenght > 0)
+        {
+            LPSTR pszText;
+            DWORD dwBufferSize = dwTextLenght + 1;
+
+            pszText = (LPSTR)GlobalAlloc(GPTR, dwBufferSize);
+            if(pszText != NULL)
+            {
+                if(GetWindowText(hEdit, pszText, dwBufferSize)) //unicode
+                {
+                    DWORD dwWritten;
+
+                    if(WriteFile(hFile, pszText, dwTextLenght, &dwWritten, NULL))
+                        bSuccess = TRUE;
+                }
+                GlobalFree(pszText);
+            }
+        }
+        CloseHandle(hFile);
+    }
+    return bSuccess;
+}
+
+void DoFileOpen(HWND hwnd)
+{
+    OPENFILENAME ofn;
+    char szFileName[MAX_PATH] = "";
+
+    ZeroMemory(&ofn, sizeof(ofn));
+
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
+    ofn.lpstrFile = szFileName;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+    ofn.lpstrDefExt = "txt";
+
+    if(GetOpenFileName(&ofn)) //unicode
+    {
+        HWND hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
+        LoadTextFileToEdit(hEdit, szFileName);
+    }
+}
+
+void DoFileSave(HWND hwnd)
+{
+    OPENFILENAME ofn;
+    char szFileName[MAX_PATH] = "";
+
+    ZeroMemory(&ofn, sizeof(ofn));
+
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
+    ofn.lpstrFile = szFileName;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+    ofn.lpstrDefExt = "txt";
+
+    if(GetSaveFileName(&ofn)) //unicode
+    {
+        HWND hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
+        SaveTextFileFromEdit(hEdit, szFileName);
+    }
+}
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
     switch(msg){
@@ -33,6 +144,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         break;
     }
     case WM_CLOSE: {
+        ShowWindow( GetConsoleWindow(), SW_SHOW);
         DestroyWindow(hwnd);
         break;
     }
@@ -44,7 +156,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         switch(LOWORD(wParam))
         {
             //FILE
+            case ID_FILE_NEW:
+                SetDlgItemText(hwnd, IDC_MAIN_EDIT, "");
+                break;
+            case ID_FILE_OPEN:
+                DoFileOpen(hwnd);
+                break;
+            case ID_FILE_SAVEAS:
+                DoFileSave(hwnd);
+                break;
             case ID_FILE_EXIT:
+                //MessageBox(hwnd, "Are you sure do you want to quit?", "Warning", MB_ICONWARNING | MB_YESNO);
                 PostMessage(hwnd, WM_CLOSE, 0, 0);
                 break;
             case ID_EDIT_CUT:
@@ -54,13 +176,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_COPY, 0, 0);
                 break;
             case ID_EDIT_PASTE:
+                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_PASTE, 0, 0);
+                break;
+            case ID_EDIT_SELECTALL:
+                //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT,)
                 break;
             case ID_EDIT_UNDO:
+                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
                 break;
             case ID_EDIT_REDO:
+                //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_)
                 break;
             case ID_HELP_ABOUT:
-                MessageBox(hwnd, "TextPad by Phroton, Version 0.1.0.1-alpha build 25", "About", MB_OK | MB_ICONINFORMATION);
+                MessageBox(hwnd, "TextPad by Phroton, Version 0.1.0.2-alpha build 35", "About", MB_OK | MB_ICONINFORMATION);
                 break;
             case ID_HELP_VIEWONGITHUB: {
                 char linkGithub[35] = "https://github.com/PhrotonX/TextPad";
@@ -112,7 +240,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     ShowWindow(hwnd, nCmdShow);
-    //ShowWindow( GetConsoleWindow(), SW_HIDE );
+    ShowWindow( GetConsoleWindow(), SW_HIDE);
     UpdateWindow(hwnd);
 
     while(GetMessage(&Msg, NULL, 0, 0) > 0){

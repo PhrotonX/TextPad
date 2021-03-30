@@ -5,20 +5,20 @@
 #define VER_MINORV                              "1"
 #define VER_PATCH                               "0"
 #define VER_DEV                                 "2-alpha"
-#define VER_BUILD                               "26"
+#define VER_BUILD                               "36"
 
 #define IDR_MENU1                               100
-#define ID_FILE_NEW                             40000
-#define ID_FILE_OPEN                            40001
+#define ID_FILE_NEW                             40000 //DONE
+#define ID_FILE_OPEN                            40001 //UNICODE
 #define ID_FILE_SAVE                            40002
-#define ID_FILE_SAVEAS                          40003
-#define ID_FILE_EXIT                            40004 //DONE
-#define ID_EDIT_CUT                             40005
-#define ID_EDIT_COPY                            40006
-#define ID_EDIT_PASTE                           40007
+#define ID_FILE_SAVEAS                          40003 //UNICODE
+#define ID_FILE_EXIT                            40004 //TEMP
+#define ID_EDIT_CUT                             40005 //DONE
+#define ID_EDIT_COPY                            40006 //DONE
+#define ID_EDIT_PASTE                           40007 //DONE
 #define ID_EDIT_SELECTALL                       40008
 #define ID_EDIT_DESELECTALL                     40009
-#define ID_EDIT_UNDO                            40024
+#define ID_EDIT_UNDO                            40024 //DONE
 #define ID_EDIT_REDO                            40025
 #define ID_VIEW_STATUSBAR                       40010
 #define ID_VIEW_WORDWRAP                        40011

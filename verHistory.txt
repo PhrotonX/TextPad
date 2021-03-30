@@ -4,7 +4,11 @@ Created in March 29, 2021
 
 Version 0.1.0.2 alpha build - 
 -Added function to Help > View on GitHub
--Added non-functional Undo & Redo in Edit Menu
+-Added Undo and non-functional Redo button under Edit menu
+-Added Seperators inside Edit menu
+-Added function to Cut, Copy & Paste under Edit menu
+-Added function to Save As, New & Open
+-Debug window is now hidden by default
 
 Version 0.1.0.1 alpha build 19 - March 29, 2021
 -Added basic code & resources
