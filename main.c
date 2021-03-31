@@ -1,11 +1,14 @@
 #include <windows.h>
 #include "resource.h"
 #include <stdio.h>
+#include <commctrl.h>
 
 const char g_szClassName[] = "textPad";
-#define IDC_MAIN_EDIT     101
+#define IDC_MAIN_EDIT       101
+#define IDC_MAIN_TOOLBAR    102
+#define IDC_MAIN_STATUS     103
 
-int build = 39;
+int build = 73;
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
@@ -91,7 +94,13 @@ void DoFileOpen(HWND hwnd)
     if(GetOpenFileName(&ofn)) //unicode
     {
         HWND hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
-        LoadTextFileToEdit(hEdit, szFileName);
+        if(LoadTextFileToEdit(hEdit, szFileName))
+        {
+            SendDlgItemMessage(hwnd, IDC_MAIN_STATUS, SB_SETTEXT, 0, (LPARAM)"Opened");
+            SendDlgItemMessage(hwnd, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM)szFileName);
+
+            SetWindowText(hwnd, szFileName);
+        }
     }
 }
 
@@ -113,7 +122,42 @@ void DoFileSave(HWND hwnd)
     if(GetSaveFileName(&ofn)) //unicode
     {
         HWND hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
-        SaveTextFileFromEdit(hEdit, szFileName);
+        if(SaveTextFileFromEdit(hEdit, szFileName))
+        {
+            SendDlgItemMessage(hwnd, IDC_MAIN_STATUS, SB_SETTEXT, 0, (LPARAM)"Saved");
+            SendDlgItemMessage(hwnd, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM)szFileName);
+
+            SetWindowText(hwnd, szFileName);
+        }
+    }
+}
+
+void DoFileSaveOnly(HWND hwnd)
+{
+
+    OPENFILENAME ofn;
+    char szFileName[MAX_PATH] = "";
+
+    ZeroMemory(&ofn, sizeof(ofn));
+
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
+    ofn.lpstrFile = szFileName;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER;
+    ofn.lpstrDefExt = "txt";
+
+    if(GetSaveFileName(&ofn)) //unicode
+    {
+        HWND hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
+        if(SaveTextFileFromEdit(hEdit, szFileName))
+        {
+            SendDlgItemMessage(hwnd, IDC_MAIN_STATUS, SB_SETTEXT, 0, (LPARAM)"Saved");
+            SendDlgItemMessage(hwnd, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM)szFileName);
+
+            SetWindowText(hwnd, szFileName);
+        }
     }
 }
 
@@ -122,6 +166,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
     case WM_CREATE: {
         HFONT hfDefault;
         HWND hEdit;
+
+        HWND hTool;
+        TBBUTTON tbb[10];
+        TBADDBITMAP tbab;
+
+        HWND hStatus;
+        int statwidhts[] = {100, -1};
 
         hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL |
                                ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE, 0, 0, 100, 100,
@@ -133,16 +184,106 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         hfDefault = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
         SendMessage(hEdit, WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
 
+        hTool = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, hwnd, (HMENU)IDC_MAIN_TOOLBAR,
+                               GetModuleHandle(NULL), NULL);
+        if(hTool == NULL)
+            MessageBox(hwnd, "Could not create IDC_MAIN_TOOLBAR", "Error", MB_RETRYCANCEL | MB_OK);
+
+        SendMessage(hTool, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+
+        tbab.hInst = HINST_COMMCTRL;
+        tbab.nID = IDB_STD_SMALL_COLOR;
+        SendMessage(hTool, TB_ADDBITMAP, 0, (LPARAM)&tbab);
+
+        ZeroMemory(tbb, sizeof(tbb));
+
+        tbb[0].iBitmap = STD_FILENEW;
+        tbb[0].fsState = TBSTATE_ENABLED;
+        tbb[0].fsStyle = TBSTYLE_BUTTON;
+        tbb[0].idCommand = ID_FILE_NEW;
+
+        tbb[1].iBitmap = STD_FILEOPEN;
+        tbb[1].fsState = TBSTATE_ENABLED;
+        tbb[1].fsStyle = TBSTYLE_BUTTON;
+        tbb[1].idCommand = ID_FILE_OPEN;
+
+        tbb[2].iBitmap = STD_FILESAVE;
+        tbb[2].fsState = TBSTATE_ENABLED;
+        tbb[2].fsStyle = TBSTYLE_BUTTON;
+        tbb[2].idCommand = ID_FILE_SAVE;
+
+        //tbb[3].iBitmap = STD_FILEOPEN;
+        //tbb[3].fsState = TBSTATE_ENABLED;
+        tbb[3].fsStyle = TBSTYLE_SEP;
+        //tbb[3].idCommand = ID_FILE_OPEN;
+
+        tbb[4].iBitmap = STD_CUT;
+        tbb[4].fsState = TBSTATE_ENABLED;
+        tbb[4].fsStyle = TBSTYLE_BUTTON;
+        tbb[4].idCommand = ID_EDIT_CUT;
+
+        tbb[5].iBitmap = STD_COPY;
+        tbb[5].fsState = TBSTATE_ENABLED;
+        tbb[5].fsStyle = TBSTYLE_BUTTON;
+        tbb[5].idCommand = ID_EDIT_COPY;
+
+        tbb[6].iBitmap = STD_PASTE;
+        tbb[6].fsState = TBSTATE_ENABLED;
+        tbb[6].fsStyle = TBSTYLE_BUTTON;
+        tbb[6].idCommand = ID_EDIT_PASTE;
+
+        //tbb[1].iBitmap = STD_FILEOPEN;
+        //tbb[1].fsState = TBSTATE_ENABLED;
+        tbb[7].fsStyle = TBSTYLE_SEP;
+        //tbb[1].idCommand = ID_FILE_OPEN;
+
+        tbb[8].iBitmap = STD_UNDO;
+        tbb[8].fsState = TBSTATE_ENABLED;
+        tbb[8].fsStyle = TBSTYLE_BUTTON;
+        tbb[8].idCommand = ID_EDIT_UNDO;
+
+        tbb[9].iBitmap = STD_REDOW;
+        tbb[9].fsState = TBSTATE_ENABLED;
+        tbb[9].fsStyle = TBSTYLE_BUTTON;
+        tbb[9].idCommand = ID_EDIT_REDO;
+
+        SendMessage(hTool, TB_ADDBUTTONS, sizeof(tbb)/sizeof(TBBUTTON), (LPARAM)&tbb);
+
+        hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0, hwnd, (HMENU)IDC_MAIN_STATUS, GetModuleHandle(NULL), NULL);
+
+        SendMessage(hStatus, SB_SETPARTS, sizeof(statwidhts)/sizeof(int), (LPARAM)statwidhts);
+        SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)"TextPad");
+
         break;
     }
     case WM_SIZE: {
         HWND hEdit;
         RECT rcClient;
+        int iEditHeight;
+
+        HWND hTool;
+        RECT rcTool;
+        int iToolHeight;
+
+        HWND hStatus;
+        RECT rcStatus;
+        int iStatusHeight;
+
+
+        hTool = GetDlgItem(hwnd, IDC_MAIN_TOOLBAR);
+        SendMessage(hTool, TB_AUTOSIZE, 0, 0);
+        GetWindowRect(hTool, &rcTool);
+        iToolHeight = rcTool.bottom - rcTool.top;
+
+        hStatus = GetDlgItem(hwnd, IDC_MAIN_STATUS);
+        SendMessage(hStatus, WM_SIZE, 0, 0);
+        GetWindowRect(hStatus, &rcStatus);
+        iStatusHeight = rcStatus.bottom - rcStatus.top;
 
         GetClientRect(hwnd, &rcClient);
-
+        iEditHeight = rcClient.bottom - iToolHeight - iStatusHeight;
         hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
-        SetWindowPos(hEdit, NULL, 0, 0, rcClient.right, rcClient.bottom, SWP_NOZORDER);
+        SetWindowPos(hEdit, NULL, 0, iToolHeight, rcClient.right, iEditHeight, SWP_NOZORDER);
         break;
     }
     case WM_CLOSE: {
@@ -163,6 +304,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 break;
             case ID_FILE_OPEN:
                 DoFileOpen(hwnd);
+                break;
+            case ID_FILE_SAVE:
+                DoFileSaveOnly(hwnd);
                 break;
             case ID_FILE_SAVEAS:
                 DoFileSave(hwnd);
@@ -192,11 +336,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_HELP_ABOUT:
                 {
                     char buffer[0xff];
-                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.2-alpha build %d\n", build);
-                    MessageBox(NULL, buffer, "About TextPad", MB_OK | MB_ICONINFORMATION);
+                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.3-alpha build %d\n", build);
+                    MessageBox(NULL, buffer, "About TextPad", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
                 }
 
                 break;
+            case ID_HELP_CHECKFORUPDATES: {
+                char linkUpdatesTemp[45] = "https://github.com/PhrotonX/TextPad/releases";
+                ShellExecute(NULL, "open", linkUpdatesTemp, NULL, NULL, SW_SHOWNORMAL);
+                break;
+            }
             case ID_HELP_VIEWONGITHUB: {
                 char linkGithub[35] = "https://github.com/PhrotonX/TextPad";
                 ShellExecute(NULL, "open", linkGithub, NULL, NULL, SW_SHOWNORMAL);
@@ -237,9 +386,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
-    hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, g_szClassName, "TextPad", WS_OVERLAPPEDWINDOW,
+    hwnd = CreateWindowEx(WS_EX_APPWINDOW, g_szClassName, "TextPad", WS_OVERLAPPEDWINDOW,
                           CW_USEDEFAULT, CW_USEDEFAULT, 760, 420, NULL, NULL, hInstance, NULL);
-
 
     if(hwnd == NULL){
         MessageBox(NULL, "Error", "Window Creation Failed", MB_ICONHAND | MB_OK);

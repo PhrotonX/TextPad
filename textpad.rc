@@ -39,9 +39,9 @@ IDR_MENU1 MENU
     }
     POPUP "&View"
     {
-        MENUITEM "&Status Bar", ID_VIEW_STATUSBAR
+        MENUITEM "&Status Bar", ID_VIEW_STATUSBAR, CHECKED
         MENUITEM "&Word Wrap", ID_VIEW_WORDWRAP
-        MENUITEM "&Toolbar", ID_VIEW_TOOLBAR
+        MENUITEM "&Toolbar", ID_VIEW_TOOLBAR, CHECKED
         MENUITEM "&Debug Window", ID_VIEW_DEBUGWINDOW
     }
     POPUP "&Format"
