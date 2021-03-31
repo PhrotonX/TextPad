@@ -1,2 +1,2 @@
 # TextPad
- Create & edit files
+ Create & edit text files
