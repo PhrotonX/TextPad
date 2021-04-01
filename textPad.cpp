@@ -4,6 +4,7 @@
 #include <commctrl.h>
 #include <string.h>
 #include <iostream>
+#include <winuser.h>
 
 const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT       101
@@ -15,7 +16,7 @@ namespace ver{
     int minor = 1;
     int revision = 0;
     int dev = 4;
-    int build = 78;
+    int build = 94;
 }
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
@@ -84,25 +85,25 @@ BOOL SaveTextFileFromEdit(HWND hEdit, LPCTSTR pszFileName)
     return bSuccess;
 }
 
-BOOL CALLBACK AboutDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch(Message)
-	{
-		case WM_INITDIALOG:
-
-		return TRUE;
-		case WM_COMMAND:
-			switch(LOWORD(wParam))
-			{
-				case ID_ABOUTDIALOG_OK:
-					EndDialog(hwnd, IDOK);
-				break;
-			}
-		break;
-		default:
-			return FALSE;
-	}
-	return TRUE;
+    switch(msg)
+    {
+    case WM_INITDIALOG:
+        return TRUE;
+        break;
+    case WM_COMMAND:
+        switch(LOWORD(wParam))
+        {
+        case ID_ABOUTDIALOG_OK:
+            EndDialog(hwnd, ID_ABOUTDIALOG_OK);
+            break;
+        }
+        break;
+    default:
+        return FALSE;
+    }
+    return TRUE;
 }
 
 void DoFileOpen(HWND hwnd)
@@ -189,6 +190,8 @@ void DoFileSaveOnly(HWND hwnd)
         }
     }
 }
+
+
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
     switch(msg){
@@ -360,17 +363,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
                 break;
             case ID_EDIT_REDO:
-                //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_)
+                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
                 break;
             case ID_HELP_ABOUT:
-                int ret = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUTDIALOG), hwnd, AboutDlgProc(hwnd, Message, wParam, lParam));
-                /*
                 {
                     char buffer[0xff];
                     sprintf(buffer, "TextPad by Phroton, Version 0.1.0.4-alpha build %d\n", ver::build);
                     MessageBox(NULL, buffer, "About TextPad", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+
+                    int ret = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUTDIALOG), hwnd, /*(DLGPROC)AboutDlgProc(hwnd, msg, wParam, lParam)*/0);
                 }
-*/
+
                 break;
             case ID_HELP_CHECKFORUPDATES: {
                 char linkUpdatesTemp[45] = "https://github.com/PhrotonX/TextPad/releases";
