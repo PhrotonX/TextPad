@@ -10,12 +10,12 @@ const char g_szClassName[] = "textPad";
 #define IDC_MAIN_TOOLBAR    102
 #define IDC_MAIN_STATUS     103
 
+int build = 75;
 namespace ver{
-    int major = 0;
-    int minor = 1;
-    int revision = 0;
-    int dev = 4;
-    int build = 77;
+    int major = "0";
+    int minor = "1";
+    int revision = "0";
+    int dev = "4";
 }
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
@@ -344,7 +344,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_HELP_ABOUT:
                 {
                     char buffer[0xff];
-                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.4-alpha build %d\n", ver::build);
+                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.4-alpha build %d\n", build);
                     MessageBox(NULL, buffer, "About TextPad", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
                 }
 
