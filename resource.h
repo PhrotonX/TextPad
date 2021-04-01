@@ -1,6 +1,7 @@
 #ifndef IDC_STATIC
 #define IDC_STATIC (-1)
 #endif
+
 #define VER_MAJORV                              "0"
 #define VER_MINORV                              "1"
 #define VER_PATCH                               "0"
