@@ -10,7 +10,7 @@ const char g_szClassName[] = "textPad";
 #define IDC_MAIN_TOOLBAR    102
 #define IDC_MAIN_STATUS     103
 
-int build = 75;
+int build = 77;
 namespace ver{
     int major = "0";
     int minor = "1";
