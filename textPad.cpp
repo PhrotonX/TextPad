@@ -25,7 +25,7 @@ BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
         if(dwFileSize != 0xFFFFFFFF)
         {
             LPSTR pszFileText;
-            pszFileText = GlobalAlloc(GPTR, dwFileSize + 1);
+            pszFileText = (LPSTR)GlobalAlloc(GPTR, dwFileSize + 1);
 
             if(pszFileText != NULL)
             {
