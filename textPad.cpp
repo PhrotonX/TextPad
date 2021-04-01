@@ -3,13 +3,20 @@
 #include <stdio.h>
 #include <commctrl.h>
 #include <string.h>
+#include <iostream>
 
 const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT       101
 #define IDC_MAIN_TOOLBAR    102
 #define IDC_MAIN_STATUS     103
 
-int build = 74;
+int build = 75;
+namespace ver{
+    int major = "0";
+    int minor = "1";
+    int revision = "0";
+    int dev = "4";
+}
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
