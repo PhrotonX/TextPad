@@ -2,13 +2,21 @@
 #include "resource.h"
 #include <stdio.h>
 #include <commctrl.h>
+#include <string.h>
+#include <iostream>
 
 const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT       101
 #define IDC_MAIN_TOOLBAR    102
 #define IDC_MAIN_STATUS     103
 
-int build = 73;
+int build = 75;
+namespace ver{
+    int major = "0";
+    int minor = "1";
+    int revision = "0";
+    int dev = "4";
+}
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
@@ -24,7 +32,7 @@ BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
         if(dwFileSize != 0xFFFFFFFF)
         {
             LPSTR pszFileText;
-            pszFileText = GlobalAlloc(GPTR, dwFileSize + 1);
+            pszFileText = (LPSTR)GlobalAlloc(GPTR, dwFileSize + 1);
 
             if(pszFileText != NULL)
             {
@@ -336,7 +344,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_HELP_ABOUT:
                 {
                     char buffer[0xff];
-                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.3-alpha build %d\n", build);
+                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.4-alpha build %d\n", build);
                     MessageBox(NULL, buffer, "About TextPad", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
                 }
 
@@ -347,7 +355,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 break;
             }
             case ID_HELP_VIEWONGITHUB: {
-                char linkGithub[35] = "https://github.com/PhrotonX/TextPad";
+                char linkGithub[36] = "https://github.com/PhrotonX/TextPad";
                 ShellExecute(NULL, "open", linkGithub, NULL, NULL, SW_SHOWNORMAL);
                 break;
             }
@@ -375,7 +383,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     wc.hIcon            =   LoadIcon(NULL, IDI_APPLICATION);
     wc.hCursor          =   LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground    =   (HBRUSH)(COLOR_WINDOW+1);
-    wc.lpszMenuName     =   (HMENU)MAKEINTRESOURCE(IDR_MENU1);
+    wc.lpszMenuName     =   MAKEINTRESOURCE(IDR_MENU1);
     wc.lpszClassName    =   g_szClassName;
     wc.hIconSm          =   LoadIcon(NULL, IDI_APPLICATION);
 
