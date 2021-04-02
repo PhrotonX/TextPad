@@ -15,8 +15,8 @@ namespace ver{
     int major = 0;
     int minor = 1;
     int revision = 0;
-    int dev = 4;
-    int build = 94;
+    int dev = 5;
+    int build = 96;
 }
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
@@ -49,6 +49,7 @@ BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
             }
         }
     }
+    return bSuccess;
 }
 
 BOOL SaveTextFileFromEdit(HWND hEdit, LPCTSTR pszFileName)
@@ -85,7 +86,7 @@ BOOL SaveTextFileFromEdit(HWND hEdit, LPCTSTR pszFileName)
     return bSuccess;
 }
 
-BOOL CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch(msg)
     {
@@ -368,10 +369,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_HELP_ABOUT:
                 {
                     char buffer[0xff];
-                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.4-alpha build %d\n", ver::build);
+                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.5-alpha build %d\n", ver::build);
                     MessageBox(NULL, buffer, "About TextPad", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
 
-                    int ret = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUTDIALOG), hwnd, /*(DLGPROC)AboutDlgProc(hwnd, msg, wParam, lParam)*/0);
+                    int ret = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUTDIALOG), hwnd, /*(DLGPROC)AboutDlgProc(hwnd, msg, wParam, lParam)*/ AboutDlgProc);
                 }
 
                 break;

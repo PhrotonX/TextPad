@@ -16,3 +16,9 @@ git rm --cached
 TextPad.depend
 obj/Debug/main.o
 bin/Debug/TextPad.exe
+/.vs
+/x64/Debug
+/TextPad.sln
+/TextPad.vcxproj
+*.filters
+*.user
