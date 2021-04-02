@@ -19,7 +19,7 @@ namespace ver{
     int minor = 1;
     int revision = 0;
     int dev = 5;
-    int build = 103;
+    int build = 106;
 }
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
@@ -233,6 +233,8 @@ void DoSelectFont(HWND hwnd)
         }
         g_rgbText = cf.rgbColors;
     }
+
+    SendMessage(hwnd, WM_SETFONT, (WPARAM)hf, TRUE);
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
