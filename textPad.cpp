@@ -11,12 +11,15 @@ const char g_szClassName[] = "textPad";
 #define IDC_MAIN_TOOLBAR    102
 #define IDC_MAIN_STATUS     103
 
+HFONT g_hfFont = NULL;
+COLORREF g_rgbText = RGB(0, 0, 0);
+
 namespace ver{
     int major = 0;
     int minor = 1;
     int revision = 0;
     int dev = 5;
-    int build = 96;
+    int build = 103;
 }
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
@@ -99,6 +102,20 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case ID_ABOUTDIALOG_OK:
             EndDialog(hwnd, ID_ABOUTDIALOG_OK);
             break;
+        case ID_ABOUTDIALOG_VIEWONGITHUB:
+        {
+            char linkGithub[36] = "https://github.com/PhrotonX/TextPad";
+            ShellExecute(NULL, "open", linkGithub, NULL, NULL, SW_SHOWNORMAL);
+            break;
+        }
+            
+        case ID_ABOUTDIALOG_CHECKFORUPDATES:
+        {
+            char linkUpdatesTemp[45] = "https://github.com/PhrotonX/TextPad/releases";
+            ShellExecute(NULL, "open", linkUpdatesTemp, NULL, NULL, SW_SHOWNORMAL);
+            break;
+        }
+            
         }
         break;
     default:
@@ -192,7 +209,31 @@ void DoFileSaveOnly(HWND hwnd)
     }
 }
 
+void DoSelectFont(HWND hwnd)
+{
+    CHOOSEFONT cf = { sizeof(CHOOSEFONT) };
+    LOGFONT lf;
 
+    GetObject(g_hfFont, sizeof(LOGFONT), &lf);
+
+    cf.Flags = CF_EFFECTS | CF_INITTOLOGFONTSTRUCT | CF_SCREENFONTS;
+    cf.hwndOwner = hwnd;
+    cf.lpLogFont = &lf;
+    cf.rgbColors = g_rgbText;
+
+    if (ChooseFont(&cf))
+    {
+        HFONT hf = CreateFontIndirect(&lf);
+        if (hf)
+        {
+            g_hfFont = hf;
+        }
+        else {
+            MessageBox(hwnd, "Failed to open ChooseFont()", "Error", MB_OK | MB_ICONERROR);
+        }
+        g_rgbText = cf.rgbColors;
+    }
+}
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
     switch(msg){
@@ -201,7 +242,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         HWND hEdit;
 
         HWND hTool;
-        TBBUTTON tbb[10];
+        TBBUTTON tbb[12];
         TBADDBITMAP tbab;
 
         HWND hStatus;
@@ -280,6 +321,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         tbb[9].fsStyle = TBSTYLE_BUTTON;
         tbb[9].idCommand = ID_EDIT_REDO;
 
+        tbb[10].fsStyle = TBSTYLE_SEP;
+
+        tbb[11].iBitmap = STD_HELP;
+        tbb[11].fsState = TBSTATE_ENABLED;
+        tbb[11].fsState = TBSTYLE_BUTTON;
+        tbb[11].idCommand = ID_HELP_GETHELP;
+
         SendMessage(hTool, TB_ADDBUTTONS, sizeof(tbb)/sizeof(TBBUTTON), (LPARAM)&tbb);
 
         hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0, hwnd, (HMENU)IDC_MAIN_STATUS, GetModuleHandle(NULL), NULL);
@@ -317,6 +365,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         iEditHeight = rcClient.bottom - iToolHeight - iStatusHeight;
         hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
         SetWindowPos(hEdit, NULL, 0, iToolHeight, rcClient.right, iEditHeight, SWP_NOZORDER);
+
         break;
     }
     case WM_CLOSE: {
@@ -348,6 +397,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 //MessageBox(hwnd, "Are you sure do you want to quit?", "Warning", MB_ICONWARNING | MB_YESNO);
                 PostMessage(hwnd, WM_CLOSE, 0, 0);
                 break;
+            //EDIT
             case ID_EDIT_CUT:
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_CUT, 0, 0);
                 break;
@@ -366,6 +416,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_EDIT_REDO:
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
                 break;
+            //FORMAT
+            case ID_FORMAT_FONT:
+                DoSelectFont(hwnd);
+
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+                break;
+            //HELP
             case ID_HELP_ABOUT:
                 {
                     char buffer[0xff];
@@ -422,7 +480,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     hwnd = CreateWindowEx(WS_EX_APPWINDOW, g_szClassName, "TextPad", WS_OVERLAPPEDWINDOW,
-                          CW_USEDEFAULT, CW_USEDEFAULT, 760, 420, NULL, NULL, hInstance, NULL);
+                          CW_USEDEFAULT, CW_USEDEFAULT, 1020, 520, NULL, NULL, hInstance, NULL);
 
     if(hwnd == NULL){
         MessageBox(NULL, "Error", "Window Creation Failed", MB_ICONHAND | MB_OK);
