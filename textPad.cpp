@@ -4,7 +4,7 @@
 #include <commctrl.h>
 #include <string.h>
 #include <iostream>
-#include <winuser.h>
+//#include <winuser.h>
 
 const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT       101
@@ -18,9 +18,11 @@ namespace ver{
     int major = 0;
     int minor = 1;
     int revision = 0;
-    int dev = 5;
-    int build = 107;
+    int dev = 6;
+    int build = 137;
 }
+
+//std::cout << ver::major << "." << ver::minor << "." << ver::revision << "." << ver::dev << "." << ver::build << std::endl;
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
@@ -108,14 +110,14 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             ShellExecute(NULL, "open", linkGithub, NULL, NULL, SW_SHOWNORMAL);
             break;
         }
-            
+
         case ID_ABOUTDIALOG_CHECKFORUPDATES:
         {
             char linkUpdatesTemp[45] = "https://github.com/PhrotonX/TextPad/releases";
             ShellExecute(NULL, "open", linkUpdatesTemp, NULL, NULL, SW_SHOWNORMAL);
             break;
         }
-            
+
         }
         break;
     default:
@@ -220,21 +222,25 @@ void DoSelectFont(HWND hwnd)
     cf.hwndOwner = hwnd;
     cf.lpLogFont = &lf;
     cf.rgbColors = g_rgbText;
+    cf.nFontType = SCREEN_FONTTYPE;
 
     if (ChooseFont(&cf))
     {
         HFONT hf = CreateFontIndirect(&lf);
-        SendMessage(hwnd, WM_SETFONT, (WPARAM)hf, TRUE);
         if (hf)
         {
             g_hfFont = hf;
+            SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_SETFONT, (WPARAM)g_hfFont, TRUE);
+            //SendMessage(hwnd, WM_SETFONT, (WPARAM)g_hfFont, TRUE);
+            //DeleteObject(&lf);
+            //UpdateWindow(hwnd);
         }
         else {
             MessageBox(hwnd, "Failed to open ChooseFont()", "Error", MB_OK | MB_ICONERROR);
         }
         g_rgbText = cf.rgbColors;
     }
-    
+
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
@@ -242,9 +248,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
     case WM_CREATE: {
         HFONT hfDefault;
         HWND hEdit;
+        HFONT hFont;
 
         HWND hTool;
-        TBBUTTON tbb[12];
+        TBBUTTON tbb[13];
         TBADDBITMAP tbab;
 
         HWND hStatus;
@@ -258,7 +265,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             MessageBox(hwnd, "Could not create IDC_MAIN_EDIT", "Error", MB_RETRYCANCEL | MB_ICONSTOP);
 
         hfDefault = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
-        SendMessage(hEdit, WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
+        //GetObject((HFONT)GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
+        //SendMessage(hEdit, WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
+
+        hFont = CreateFont(0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, TEXT("Consolas"));
+        SendMessage (hEdit, WM_SETFONT, (WPARAM)hFont, TRUE);
 
         hTool = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, hwnd, (HMENU)IDC_MAIN_TOOLBAR,
                                GetModuleHandle(NULL), NULL);
@@ -308,27 +319,32 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         tbb[6].fsStyle = TBSTYLE_BUTTON;
         tbb[6].idCommand = ID_EDIT_PASTE;
 
+        tbb[7].iBitmap = STD_DELETE;
+        tbb[7].fsState = TBSTATE_ENABLED;
+        tbb[7].fsState = TBSTYLE_BUTTON;
+        tbb[7].idCommand = ID_EDIT_CLEAR;
+
         //tbb[1].iBitmap = STD_FILEOPEN;
         //tbb[1].fsState = TBSTATE_ENABLED;
-        tbb[7].fsStyle = TBSTYLE_SEP;
+        tbb[8].fsStyle = TBSTYLE_SEP;
         //tbb[1].idCommand = ID_FILE_OPEN;
 
-        tbb[8].iBitmap = STD_UNDO;
-        tbb[8].fsState = TBSTATE_ENABLED;
-        tbb[8].fsStyle = TBSTYLE_BUTTON;
-        tbb[8].idCommand = ID_EDIT_UNDO;
-
-        tbb[9].iBitmap = STD_REDOW;
+        tbb[9].iBitmap = STD_UNDO;
         tbb[9].fsState = TBSTATE_ENABLED;
         tbb[9].fsStyle = TBSTYLE_BUTTON;
-        tbb[9].idCommand = ID_EDIT_REDO;
+        tbb[9].idCommand = ID_EDIT_UNDO;
 
-        tbb[10].fsStyle = TBSTYLE_SEP;
+        tbb[10].iBitmap = STD_REDOW;
+        tbb[10].fsState = TBSTATE_ENABLED;
+        tbb[10].fsStyle = TBSTYLE_BUTTON;
+        tbb[10].idCommand = ID_EDIT_REDO;
 
-        tbb[11].iBitmap = STD_HELP;
-        tbb[11].fsState = TBSTATE_ENABLED;
-        tbb[11].fsState = TBSTYLE_BUTTON;
-        tbb[11].idCommand = ID_HELP_GETHELP;
+        tbb[11].fsStyle = TBSTYLE_SEP;
+
+        tbb[12].iBitmap = STD_HELP;
+        tbb[12].fsState = TBSTATE_ENABLED;
+        tbb[12].fsState = TBSTYLE_BUTTON;
+        tbb[12].idCommand = ID_HELP_GETHELP;
 
         SendMessage(hTool, TB_ADDBUTTONS, sizeof(tbb)/sizeof(TBBUTTON), (LPARAM)&tbb);
 
@@ -418,6 +434,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_EDIT_REDO:
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
                 break;
+            case ID_EDIT_CLEAR:
+                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_CLEAR, 0, 0);
+                break;
             //FORMAT
             case ID_FORMAT_FONT:
                 DoSelectFont(hwnd);
@@ -429,7 +448,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_HELP_ABOUT:
                 {
                     char buffer[0xff];
-                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.5-alpha build %d\n", ver::build);
+                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.6-alpha build %d\n", ver::build);
                     MessageBox(NULL, buffer, "About TextPad", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
 
                     int ret = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUTDIALOG), hwnd, /*(DLGPROC)AboutDlgProc(hwnd, msg, wParam, lParam)*/ AboutDlgProc);
