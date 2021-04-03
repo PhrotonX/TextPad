@@ -2,8 +2,9 @@
 #define IDC_STATIC (-1)
 #endif
 
+#define WM_INITDIALOG                           0x0110
 #define IDR_MENU1                               100
-#define IDD_ABOUTDIALOG                        101
+#define IDD_ABOUTDIALOG                         101
 #define ID_ABOUTDIALOG_OK                       10000
 #define ID_ABOUTDIALOG_VIEWONGITHUB             10002
 #define ID_ABOUTDIALOG_CHECKFORUPDATES          10003
@@ -33,3 +34,4 @@
 #define ID_VIEW_DEBUGWINDOW                     40023
 #define ID_EDIT_UNDO                            40024
 #define ID_EDIT_REDO                            40025
+#define ID_EDIT_CLEAR                           40026
