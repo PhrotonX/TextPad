@@ -19,7 +19,7 @@ namespace ver{
     int minor = 1;
     int revision = 0;
     int dev = 7;
-    int build = 146;
+    int build = 147;
 }
 
 //std::cout << ver::major << "." << ver::minor << "." << ver::revision << "." << ver::dev << "." << ver::build << std::endl;
@@ -450,6 +450,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 UpdateWindow(hwnd);
                 break;
             //HELP
+            case ID_HELP_GETHELP:
+                {
+                    char dirHelp[0xff] = "textpadHelp.chm";
+                    ShellExecute(NULL, "open", dirHelp, NULL, NULL, SW_SHOWNORMAL);
+                    break;
+                }
             case ID_HELP_ABOUT:
                 {
                     char buffer[0xff];
