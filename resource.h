@@ -2,6 +2,8 @@
 #define IDC_STATIC (-1)
 #endif
 
+
+
 #define WM_INITDIALOG                           0x0110
 #define IDR_MENU1                               100
 #define IDD_ABOUTDIALOG                         101

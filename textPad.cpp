@@ -18,8 +18,8 @@ namespace ver{
     int major = 0;
     int minor = 1;
     int revision = 0;
-    int dev = 6;
-    int build = 137;
+    int dev = 7;
+    int build = 146;
 }
 
 //std::cout << ver::major << "." << ver::minor << "." << ver::revision << "." << ver::dev << "." << ver::build << std::endl;
@@ -231,9 +231,6 @@ void DoSelectFont(HWND hwnd)
         {
             g_hfFont = hf;
             SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_SETFONT, (WPARAM)g_hfFont, TRUE);
-            //SendMessage(hwnd, WM_SETFONT, (WPARAM)g_hfFont, TRUE);
-            //DeleteObject(&lf);
-            //UpdateWindow(hwnd);
         }
         else {
             MessageBox(hwnd, "Failed to open ChooseFont()", "Error", MB_OK | MB_ICONERROR);
@@ -257,6 +254,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         HWND hStatus;
         int statwidhts[] = {100, -1};
 
+        g_hfFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+
         hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL |
                                ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE, 0, 0, 100, 100,
                                hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
@@ -264,7 +263,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         if(hEdit == NULL)
             MessageBox(hwnd, "Could not create IDC_MAIN_EDIT", "Error", MB_RETRYCANCEL | MB_ICONSTOP);
 
-        hfDefault = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+        //hfDefault = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
         //GetObject((HFONT)GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
         //SendMessage(hEdit, WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
 
@@ -299,10 +298,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         tbb[2].fsStyle = TBSTYLE_BUTTON;
         tbb[2].idCommand = ID_FILE_SAVE;
 
-        //tbb[3].iBitmap = STD_FILEOPEN;
-        //tbb[3].fsState = TBSTATE_ENABLED;
         tbb[3].fsStyle = TBSTYLE_SEP;
-        //tbb[3].idCommand = ID_FILE_OPEN;
 
         tbb[4].iBitmap = STD_CUT;
         tbb[4].fsState = TBSTATE_ENABLED;
@@ -321,7 +317,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         tbb[7].iBitmap = STD_DELETE;
         tbb[7].fsState = TBSTATE_ENABLED;
-        tbb[7].fsState = TBSTYLE_BUTTON;
+        tbb[7].fsStyle = TBSTYLE_BUTTON;
         tbb[7].idCommand = ID_EDIT_CLEAR;
 
         //tbb[1].iBitmap = STD_FILEOPEN;
@@ -343,7 +339,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         tbb[12].iBitmap = STD_HELP;
         tbb[12].fsState = TBSTATE_ENABLED;
-        tbb[12].fsState = TBSTYLE_BUTTON;
+        tbb[12].fsStyle = TBSTYLE_BUTTON;
         tbb[12].idCommand = ID_HELP_GETHELP;
 
         SendMessage(hTool, TB_ADDBUTTONS, sizeof(tbb)/sizeof(TBBUTTON), (LPARAM)&tbb);
@@ -352,6 +348,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         SendMessage(hStatus, SB_SETPARTS, sizeof(statwidhts)/sizeof(int), (LPARAM)statwidhts);
         SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)"TextPad");
+
+        EnableWindow(hTool, ID_EDIT_CLEAR);
 
         break;
     }
@@ -440,6 +438,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             //FORMAT
             case ID_FORMAT_FONT:
                 DoSelectFont(hwnd);
+
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+                break;
+            case ID_FORMAT_DEFAULTFONT:
+                DeleteObject(g_hfFont);
+                g_hfFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
