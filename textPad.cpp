@@ -14,16 +14,6 @@ const char g_szClassName[] = "textPad";
 HFONT g_hfFont = NULL;
 COLORREF g_rgbText = RGB(0, 0, 0);
 
-namespace ver{
-    int major = 0;
-    int minor = 1;
-    int revision = 0;
-    int dev = 7;
-    int build = 147;
-}
-
-//std::cout << ver::major << "." << ver::minor << "." << ver::revision << "." << ver::dev << "." << ver::build << std::endl;
-
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
     HANDLE hFile;
@@ -240,6 +230,50 @@ void DoSelectFont(HWND hwnd)
 
 }
 
+HINSTANCE g_hinst;
+
+HWND WINAPI InitializeHotkey(HWND hwndDlg)
+{
+    HWND hwndHot = NULL;
+
+    // Ensure that the common control DLL is loaded.
+    INITCOMMONCONTROLSEX icex;  //declare an INITCOMMONCONTROLSEX Structure
+    icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    icex.dwICC = ICC_HOTKEY_CLASS;   //set dwICC member to ICC_HOTKEY_CLASS
+                                     // this loads the Hot Key control class.
+    InitCommonControlsEx(&icex);
+
+    hwndHot = CreateWindowEx(0,                        // no extended styles
+                             HOTKEY_CLASS,             // class name
+                             TEXT(""),                 // no title (caption)
+                             WS_CHILD | WS_VISIBLE,    // style
+                             15, 10,                   // position
+                             200, 20,                  // size
+                             hwndDlg,                  // parent window
+                             NULL,                     // uses class menu
+                             g_hinst,                  // instance
+                             NULL);                    // no WM_CREATE parameter
+
+    SetFocus(hwndHot);
+
+    // Set rules for invalid key combinations. If the user does not supply a
+    // modifier key, use ALT as a modifier. If the user supplies SHIFT as a
+    // modifier key, use SHIFT + ALT instead.
+    SendMessage(hwndHot,
+                HKM_SETRULES,
+                (WPARAM) HKCOMB_NONE | HKCOMB_S,   // invalid key combinations
+                MAKELPARAM(HOTKEYF_ALT, 0));       // add ALT to invalid entries
+
+    // Set CTRL + ALT + A as the default hot key for this window.
+    // 0x41 is the virtual key code for 'A'.
+    SendMessage(hwndHot,
+                HKM_SETHOTKEY,
+                MAKEWORD(0x41, HOTKEYF_CONTROL | HOTKEYF_ALT),
+                0);
+
+    return hwndHot;
+}
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
     switch(msg){
     case WM_CREATE: {
@@ -385,8 +419,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         break;
     }
     case WM_CLOSE: {
-        ShowWindow( GetConsoleWindow(), SW_SHOW);
-        DestroyWindow(hwnd);
+        int ret = MessageBox(hwnd, "Are you sure do you want to quit?", "Warning", MB_ICONWARNING | MB_YESNO);
+        if(ret == IDYES)
+        {
+            PostMessage(hwnd, WM_CLOSE, 0, 0);
+            ShowWindow( GetConsoleWindow(), SW_SHOW);
+            DestroyWindow(hwnd);
+        }
         break;
     }
     case WM_DESTROY: {
@@ -404,17 +443,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 DoFileOpen(hwnd);
                 break;
             case ID_FILE_SAVE:
+                //RegisterHotKey(hwnd, ID_FILE_SAVE, MOD_CONTROL, 0x53);
                 DoFileSaveOnly(hwnd);
                 break;
             case ID_FILE_SAVEAS:
                 DoFileSave(hwnd);
                 break;
             case ID_FILE_EXIT:
-                //MessageBox(hwnd, "Are you sure do you want to quit?", "Warning", MB_ICONWARNING | MB_YESNO);
-                PostMessage(hwnd, WM_CLOSE, 0, 0);
-                break;
+                {
+                    int ret = MessageBox(hwnd, "Are you sure do you want to quit?", "Warning", MB_ICONWARNING | MB_YESNO);
+                    if(ret == IDYES)
+                    {
+                        PostMessage(hwnd, WM_CLOSE, 0, 0);
+                    }
+                    break;
+                }
+
             //EDIT
             case ID_EDIT_CUT:
+                //RegisterHotKey(hwnd, ID_EDIT_CUT, MOD_CONTROL, 0x43);
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_CUT, 0, 0);
                 break;
             case ID_EDIT_COPY:
@@ -458,13 +505,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 }
             case ID_HELP_ABOUT:
                 {
-                    char buffer[0xff];
-                    sprintf(buffer, "TextPad by Phroton, Version 0.1.0.6-alpha build %d\n", ver::build);
-                    MessageBox(NULL, buffer, "About TextPad", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
-
                     int ret = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUTDIALOG), hwnd, /*(DLGPROC)AboutDlgProc(hwnd, msg, wParam, lParam)*/ AboutDlgProc);
                 }
-
                 break;
             case ID_HELP_CHECKFORUPDATES: {
                 char linkUpdatesTemp[45] = "https://github.com/PhrotonX/TextPad/releases";
