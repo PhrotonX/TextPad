@@ -88,6 +88,9 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_INITDIALOG:
         return TRUE;
         break;
+    case WM_DESTROY:
+        EndDialog(hwnd, WM_CLOSE);
+        break;
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
