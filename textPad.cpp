@@ -294,7 +294,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         g_hfFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 
         hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL |
-                               ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE, 0, 0, 100, 100,
+                               ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | WS_EX_ACCEPTFILES, 0, 0, 100, 100,
                                hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
 
         if(hEdit == NULL)
@@ -484,6 +484,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 break;
             case ID_EDIT_CLEAR:
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_CLEAR, 0, 0);
+                break;
+            //VIEW
+            case ID_VIEW_STATUSBAR:
+                {
+                HMENU hMenu = (HMENU)MAKEINTRESOURCE(IDR_MENU1);
+                CheckMenuItem(hMenu, MF_BYCOMMAND | MF_UNCHECKED, ID_VIEW_STATUSBAR);
+                UpdateWindow(hwnd);
+                }
+            case ID_VIEW_WORDWRAP:
+                {
+                    int valueWordWrap;
+                    if(valueWordWrap = 0){
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WS_);
+                        valueWordWrap = 1;
+                    }else{
+                        valueWordWrap = 0;
+                    }
+
+                }
+                UpdateWindow(hwnd);
                 break;
             //FORMAT
             case ID_FORMAT_FONT:
