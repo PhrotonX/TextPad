@@ -21,7 +21,7 @@ IDR_MENU1 MENU
         MENUITEM "&New", ID_FILE_NEW
         MENUITEM "&Open", ID_FILE_OPEN
         MENUITEM "&Save", ID_FILE_SAVE
-        MENUITEM "&Save as...", ID_FILE_SAVEAS
+        MENUITEM "S&ave as...", ID_FILE_SAVEAS
         MENUITEM SEPARATOR
         MENUITEM "E&xit", ID_FILE_EXIT
     }
@@ -31,13 +31,13 @@ IDR_MENU1 MENU
         MENUITEM "&Redo", ID_EDIT_REDO
         MENUITEM SEPARATOR
         MENUITEM "&Cut\tCtrl+X", ID_EDIT_CUT
-        MENUITEM "&Copy\tCrtl+C", ID_EDIT_COPY
+        MENUITEM "C&opy\tCrtl+C", ID_EDIT_COPY
         MENUITEM "&Paste\tCtrl+V", ID_EDIT_PASTE
         MENUITEM SEPARATOR
         MENUITEM "&Select All", ID_EDIT_SELECTALL
         MENUITEM "&Deselect All", ID_EDIT_DESELECTALL
         MENUITEM SEPARATOR
-        MENUITEM "&Clear", ID_EDIT_CLEAR
+        MENUITEM "D&elete", ID_EDIT_CLEAR
     }
     POPUP "&View"
     {
@@ -48,7 +48,7 @@ IDR_MENU1 MENU
     }
     POPUP "&Format"
     {
-        MENUITEM "&Font", ID_FORMAT_FONT
+        MENUITEM "F&ont", ID_FORMAT_FONT
         MENUITEM "&Default Font", ID_FORMAT_DEFAULTFONT
         MENUITEM SEPARATOR
         MENUITEM "&Bold", ID_FONT_BOLD
@@ -58,7 +58,7 @@ IDR_MENU1 MENU
     }
     POPUP "&Help"
     {
-        MENUITEM "&Get Help", ID_HELP_GETHELP
+        MENUITEM "&Get Help\tF1", ID_HELP_GETHELP
         MENUITEM SEPARATOR
         MENUITEM "&About", ID_HELP_ABOUT
         MENUITEM "&Check for Updates", ID_HELP_CHECKFORUPDATES
@@ -77,7 +77,7 @@ STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VIS
 CAPTION "About TextPad"
 FONT 8, "Ms Shell Dlg"
 {
-    LTEXT           "Version 0.1.0.9-alpha build 177", IDC_STATIC, 7, 17, 170, 60, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Version 0.1.0.9-alpha build 197", IDC_STATIC, 7, 17, 170, 60, SS_LEFT, WS_EX_LEFT
     LTEXT           "TextPad, by Phroton", 0, 7, 7, 66, 9, SS_LEFT, WS_EX_LEFT
     PUSHBUTTON      "Check for Updates", ID_ABOUTDIALOG_CHECKFORUPDATES, 116, 74, 63, 14, 0, WS_EX_LEFT
     PUSHBUTTON      "View on GitHub", ID_ABOUTDIALOG_VIEWONGITHUB, 57, 74, 58, 14, 0, WS_EX_LEFT
@@ -92,5 +92,5 @@ FONT 8, "Ms Shell Dlg"
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDR_ACCELERATOR1 ACCELERATORS
 {
-    VK_F1,         ID_HELP_GETHELP, VIRTKEY
+    0x70,         ID_HELP_GETHELP, VIRTKEY //F1
 }

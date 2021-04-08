@@ -495,8 +495,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_VIEW_WORDWRAP:
                 {
                     int valueWordWrap;
-                    if(valueWordWrap = 0){
-                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WS_);
+                    if(valueWordWrap == 0){
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT,);
                         valueWordWrap = 1;
                     }else{
                         valueWordWrap = 0;
@@ -504,6 +504,20 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
                 }
                 UpdateWindow(hwnd);
+                break;
+            case ID_VIEW_DEBUGWINDOW:
+                {
+                    int valueDebugWindow;
+                    if(valueDebugWindow == 0)
+                    {
+                        ShowWindow(GetConsoleWindow(), SW_SHOW);
+                        valueDebugWindow = 1;
+                    }if(valueDebugWindow == 1){
+                        ShowWindow(GetConsoleWindow(), SW_HIDE);
+                        valueDebugWindow = 0;
+                    }
+                }
+                ShowWindow(GetConsoleWindow(), SW_SHOW);
                 break;
             //FORMAT
             case ID_FORMAT_FONT:
@@ -555,6 +569,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WNDCLASSEX wc;
     HWND hwnd;
     MSG Msg;
+    bool ret;
 
     wc.cbSize           =   sizeof(WNDCLASSEX);
     wc.style            =   0;
@@ -584,6 +599,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
+    HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
+    if(hAccel == NULL)
+    {
+        MessageBox(hwnd, "Could not create accelerators", "Error", MB_OK | MB_ICONERROR);
+        return 0;
+    }
+
     ShowWindow(hwnd, nCmdShow);
     ShowWindow( GetConsoleWindow(), SW_HIDE);
     UpdateWindow(hwnd);
@@ -592,5 +614,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         TranslateMessage(&Msg);
         DispatchMessage(&Msg);
     }
+
+    while((ret = GetMessage(&Msg, NULL, 0, 0)) > 0)
+    {
+        if(ret <= 0)
+        {
+            MessageBox(hwnd, "Message failed!", "Error", MB_ICONERROR | MB_OK);
+            return 0;
+        }else{
+            if(TranslateAccelerator(hwnd, hAccel, &Msg))
+            {
+                while(GetMessage(&Msg, NULL, 0, 0) > 0){
+                    TranslateMessage(&Msg);
+                    DispatchMessage(&Msg);
+                }
+            }
+        }
+    }
+
     return Msg.wParam;
 }
