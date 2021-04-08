@@ -18,12 +18,12 @@ IDR_MENU1 MENU
 {
     POPUP "&File"
     {
-        MENUITEM "&New", ID_FILE_NEW
-        MENUITEM "&Open", ID_FILE_OPEN
-        MENUITEM "&Save", ID_FILE_SAVE
+        MENUITEM "&New\tAlt+N", ID_FILE_NEW
+        MENUITEM "&Open\tAlt+O", ID_FILE_OPEN
+        MENUITEM "&Save\tAlt+S", ID_FILE_SAVE
         MENUITEM "S&ave as...", ID_FILE_SAVEAS
         MENUITEM SEPARATOR
-        MENUITEM "E&xit", ID_FILE_EXIT
+        MENUITEM "E&xit\tAlt+F4", ID_FILE_EXIT
     }
     POPUP "&Edit"
     {
@@ -77,7 +77,7 @@ STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VIS
 CAPTION "About TextPad"
 FONT 8, "Ms Shell Dlg"
 {
-    LTEXT           "Version 0.1.0.9-alpha build 197", IDC_STATIC, 7, 17, 170, 60, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Version 0.1.0.9-alpha build 200", IDC_STATIC, 7, 17, 170, 60, SS_LEFT, WS_EX_LEFT
     LTEXT           "TextPad, by Phroton", 0, 7, 7, 66, 9, SS_LEFT, WS_EX_LEFT
     PUSHBUTTON      "Check for Updates", ID_ABOUTDIALOG_CHECKFORUPDATES, 116, 74, 63, 14, 0, WS_EX_LEFT
     PUSHBUTTON      "View on GitHub", ID_ABOUTDIALOG_VIEWONGITHUB, 57, 74, 58, 14, 0, WS_EX_LEFT
@@ -92,5 +92,8 @@ FONT 8, "Ms Shell Dlg"
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDR_ACCELERATOR1 ACCELERATORS
 {
-    0x70,         ID_HELP_GETHELP, VIRTKEY //F1
+    VK_F1,         ID_HELP_GETHELP, VIRTKEY
+    "S",            ID_FILE_SAVE, ASCII, ALT
+    "N",            ID_FILE_NEW, ASCII, ALT
+    "O",            ID_FILE_OPEN, ASCII, ALT
 }

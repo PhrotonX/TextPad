@@ -610,27 +610,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow( GetConsoleWindow(), SW_HIDE);
     UpdateWindow(hwnd);
 
-    while(GetMessage(&Msg, NULL, 0, 0) > 0){
-        TranslateMessage(&Msg);
-        DispatchMessage(&Msg);
-    }
-
-    while((ret = GetMessage(&Msg, NULL, 0, 0)) > 0)
-    {
-        if(ret <= 0)
+    while (GetMessage(&Msg, NULL, 0, 0))
         {
-            MessageBox(hwnd, "Message failed!", "Error", MB_ICONERROR | MB_OK);
-            return 0;
-        }else{
-            if(TranslateAccelerator(hwnd, hAccel, &Msg))
+            if (!TranslateAccelerator(hwnd, hAccel, &Msg))
             {
-                while(GetMessage(&Msg, NULL, 0, 0) > 0){
-                    TranslateMessage(&Msg);
-                    DispatchMessage(&Msg);
-                }
+                TranslateMessage(&Msg);
+                DispatchMessage(&Msg);
             }
         }
-    }
-
     return Msg.wParam;
 }
