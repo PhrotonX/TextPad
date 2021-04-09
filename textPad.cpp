@@ -14,6 +14,9 @@ const char g_szClassName[] = "textPad";
 HFONT g_hfFont = NULL;
 COLORREF g_rgbText = RGB(0, 0, 0);
 
+static int valueStatusBar;
+static int valueToolBar;
+
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
     HANDLE hFile;
@@ -88,7 +91,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_INITDIALOG:
         return TRUE;
         break;
-    case WM_DESTROY:
+    case WM_CLOSE:
         EndDialog(hwnd, WM_CLOSE);
         break;
     case WM_COMMAND:
@@ -381,7 +384,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         SendMessage(hTool, TB_ADDBUTTONS, sizeof(tbb)/sizeof(TBBUTTON), (LPARAM)&tbb);
 
+        if(valueStatusBar == 0)
+        {
         hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0, hwnd, (HMENU)IDC_MAIN_STATUS, GetModuleHandle(NULL), NULL);
+        }
+
+        if(hStatus == NULL)
+            MessageBox(hwnd, "Could not create Status Bar", "Error", MB_OK | MB_ICONERROR);
 
         SendMessage(hStatus, SB_SETPARTS, sizeof(statwidhts)/sizeof(int), (LPARAM)statwidhts);
         SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)"TextPad");
@@ -488,15 +497,30 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             //VIEW
             case ID_VIEW_STATUSBAR:
                 {
+                /*
                 HMENU hMenu = (HMENU)MAKEINTRESOURCE(IDR_MENU1);
-                CheckMenuItem(hMenu, MF_BYCOMMAND | MF_UNCHECKED, ID_VIEW_STATUSBAR);
+                int valueStatusBar;
+
+                if(valueStatusBar == 0)
+                {
+                    SetMenuItemInfo(hMenu, ID_VIEW_STATUSBAR, FALSE, MF_UNCHECKED);
+                }
+                //CheckMenuItem(hMenu, MF_BYCOMMAND | MF_UNCHECKED, ID_VIEW_STATUSBAR);
                 UpdateWindow(hwnd);
+                */
+                if(valueStatusBar == 0)
+                {
+                    valueStatusBar = 1;
+                }else{
+                    valueStatusBar = 0;
+                }
+
                 }
             case ID_VIEW_WORDWRAP:
                 {
                     int valueWordWrap;
                     if(valueWordWrap == 0){
-                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT,);
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, ES_CENTER, 0, 0);
                         valueWordWrap = 1;
                     }else{
                         valueWordWrap = 0;
