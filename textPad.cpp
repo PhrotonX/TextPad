@@ -14,8 +14,8 @@ const char g_szClassName[] = "textPad";
 HFONT g_hfFont = NULL;
 COLORREF g_rgbText = RGB(0, 0, 0);
 
-static int valueStatusBar;
-static int valueToolBar;
+int valueStatusBar = 0;
+int valueToolBar = 0;
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
@@ -384,10 +384,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         SendMessage(hTool, TB_ADDBUTTONS, sizeof(tbb)/sizeof(TBBUTTON), (LPARAM)&tbb);
 
-        if(valueStatusBar == 0)
-        {
         hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0, hwnd, (HMENU)IDC_MAIN_STATUS, GetModuleHandle(NULL), NULL);
-        }
 
         if(hStatus == NULL)
             MessageBox(hwnd, "Could not create Status Bar", "Error", MB_OK | MB_ICONERROR);
@@ -418,15 +415,32 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         GetWindowRect(hTool, &rcTool);
         iToolHeight = rcTool.bottom - rcTool.top;
 
-        hStatus = GetDlgItem(hwnd, IDC_MAIN_STATUS);
-        SendMessage(hStatus, WM_SIZE, 0, 0);
-        GetWindowRect(hStatus, &rcStatus);
-        iStatusHeight = rcStatus.bottom - rcStatus.top;
+        if(valueStatusBar == 0)
+        {
+            hStatus = GetDlgItem(hwnd, IDC_MAIN_STATUS);
+            SendMessage(hStatus, WM_SIZE, 0, 0);
+            GetWindowRect(hStatus, &rcStatus);
+            iStatusHeight = rcStatus.bottom - rcStatus.top;
+            UpdateWindow(hwnd);
+        }
 
         GetClientRect(hwnd, &rcClient);
-        iEditHeight = rcClient.bottom - iToolHeight - iStatusHeight;
-        hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
-        SetWindowPos(hEdit, NULL, 0, iToolHeight, rcClient.right, iEditHeight, SWP_NOZORDER);
+        if(valueStatusBar == 0)
+        {
+            iEditHeight = rcClient.bottom - iToolHeight - iStatusHeight;
+            UpdateWindow(hwnd);
+        }else{
+            iEditHeight = rcClient.bottom - iToolHeight;
+            UpdateWindow(hwnd);
+        }
+        InvalidateRect(hwnd, NULL, TRUE);
+        UpdateWindow(hwnd);
+        if(UpdateWindow(hwnd))
+        {
+            hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
+            SetWindowPos(hEdit, NULL, 0, iToolHeight, rcClient.right, iEditHeight, SWP_NOZORDER);
+            UpdateWindow(hwnd);
+        }
 
         break;
     }
@@ -510,23 +524,34 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 */
                 if(valueStatusBar == 0)
                 {
+                    SendDlgItemMessage(hwnd, ID_VIEW_STATUSBAR, MF_UNCHECKED | MF_BYPOSITION, 0, 0);
+                    SendMessage(hwnd, WS_MAXIMIZE, 0, 0);
+                    SendMessage(hwnd, WS_DLGFRAME, 0, 0);
                     valueStatusBar = 1;
                 }else{
+                    SendDlgItemMessage(hwnd, ID_VIEW_STATUSBAR, MF_CHECKED | MF_BYPOSITION, 0, 0);
+                    SendMessage(hwnd, WS_MAXIMIZE, 0, 0);
+                    SendMessage(hwnd, WS_DLGFRAME, 0, 0);
                     valueStatusBar = 0;
                 }
 
+                    InvalidateRect(hwnd, NULL, TRUE);
+                    UpdateWindow(hwnd);
                 }
             case ID_VIEW_WORDWRAP:
+                //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WS_, 0, 0);
+                /*
                 {
                     int valueWordWrap;
                     if(valueWordWrap == 0){
-                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, ES_CENTER, 0, 0);
+                        SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, ES_WANTRETURN, 0, 0);
                         valueWordWrap = 1;
                     }else{
                         valueWordWrap = 0;
                     }
 
                 }
+                */
                 UpdateWindow(hwnd);
                 break;
             case ID_VIEW_DEBUGWINDOW:
@@ -542,6 +567,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                     }
                 }
                 ShowWindow(GetConsoleWindow(), SW_SHOW);
+                break;
+            case ID_VIEW_REFRESHWINDOW:
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
                 break;
             //FORMAT
             case ID_FORMAT_FONT:

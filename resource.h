@@ -35,3 +35,4 @@
 #define ID_EDIT_UNDO                            40024
 #define ID_EDIT_REDO                            40025
 #define ID_EDIT_CLEAR                           40026
+#define ID_VIEW_REFRESHWINDOW                   40027
