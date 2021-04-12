@@ -409,12 +409,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         RECT rcStatus;
         int iStatusHeight;
 
-
-        hTool = GetDlgItem(hwnd, IDC_MAIN_TOOLBAR);
-        SendMessage(hTool, TB_AUTOSIZE, 0, 0);
-        GetWindowRect(hTool, &rcTool);
-        iToolHeight = rcTool.bottom - rcTool.top;
-
+        if(valueToolBar == 0)
+        {
+            hTool = GetDlgItem(hwnd, IDC_MAIN_TOOLBAR);
+            SendMessage(hTool, TB_AUTOSIZE, 0, 0);
+            GetWindowRect(hTool, &rcTool);
+            iToolHeight = rcTool.bottom - rcTool.top;
+        }
         if(valueStatusBar == 0)
         {
             hStatus = GetDlgItem(hwnd, IDC_MAIN_STATUS);
@@ -425,20 +426,34 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         }
 
         GetClientRect(hwnd, &rcClient);
-        if(valueStatusBar == 0)
+        if(valueStatusBar == 1 && valueToolBar == 0)
         {
-            iEditHeight = rcClient.bottom - iToolHeight - iStatusHeight;
-            UpdateWindow(hwnd);
-        }else{
             iEditHeight = rcClient.bottom - iToolHeight;
             UpdateWindow(hwnd);
         }
+        if(valueToolBar == 1 && valueStatusBar == 0){
+            iEditHeight = rcClient.bottom - iStatusHeight;
+            UpdateWindow(hwnd);
+        }if(valueToolBar == 0 && valueStatusBar == 0){
+            iEditHeight = rcClient.bottom - iToolHeight - iStatusHeight;
+            UpdateWindow(hwnd);
+        }else if(valueToolBar == 1 && valueStatusBar == 1)
+        {
+            iEditHeight = rcClient.bottom - rcClient.top;
+            UpdateWindow(hwnd);
+        }
+
         InvalidateRect(hwnd, NULL, TRUE);
         UpdateWindow(hwnd);
         if(UpdateWindow(hwnd))
         {
             hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
-            SetWindowPos(hEdit, NULL, 0, iToolHeight, rcClient.right, iEditHeight, SWP_NOZORDER);
+            if(valueToolBar==0)
+            {
+                SetWindowPos(hEdit, NULL, 0, iToolHeight, rcClient.right, iEditHeight, SWP_NOZORDER);
+            }else{
+                SetWindowPos(hEdit, NULL, 0, rcClient.bottom, rcClient.right, iEditHeight, SWP_NOZORDER);
+            }
             UpdateWindow(hwnd);
         }
 
@@ -509,6 +524,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_CLEAR, 0, 0);
                 break;
             //VIEW
+            case ID_VIEW_TOOLBAR:
+                {
+                    if(valueToolBar == 0)
+                    {
+                        valueToolBar = 1;
+                    }else if(valueToolBar == 1)
+                    {
+                        valueToolBar = 0;
+                    }
+                    InvalidateRect(hwnd, NULL, TRUE);
+                    UpdateWindow(hwnd);
+                }
+                break;
             case ID_VIEW_STATUSBAR:
                 {
                 /*
