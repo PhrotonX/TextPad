@@ -415,6 +415,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             SendMessage(hTool, TB_AUTOSIZE, 0, 0);
             GetWindowRect(hTool, &rcTool);
             iToolHeight = rcTool.bottom - rcTool.top;
+            UpdateWindow(hwnd);
         }
         if(valueStatusBar == 0)
         {
@@ -426,20 +427,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         }
 
         GetClientRect(hwnd, &rcClient);
-        if(valueStatusBar == 1 && valueToolBar == 0)
-        {
+        GetWindowRect(hwnd, &rcStatus);
+        GetWindowRect(hwnd, &rcTool);
+        if(valueStatusBar == 1 && valueToolBar == 0){
+            GetWindowRect(hwnd, &rcTool);
             iEditHeight = rcClient.bottom - iToolHeight;
             UpdateWindow(hwnd);
-        }
-        if(valueToolBar == 1 && valueStatusBar == 0){
+        }if(valueToolBar == 1 && valueStatusBar == 0){
+            GetWindowRect(hwnd, &rcStatus);
             iEditHeight = rcClient.bottom - iStatusHeight;
             UpdateWindow(hwnd);
         }if(valueToolBar == 0 && valueStatusBar == 0){
             iEditHeight = rcClient.bottom - iToolHeight - iStatusHeight;
             UpdateWindow(hwnd);
-        }else if(valueToolBar == 1 && valueStatusBar == 1)
-        {
-            iEditHeight = rcClient.bottom - rcClient.top;
+        }if(valueToolBar == 1 && valueStatusBar == 1){
+            iEditHeight = rcClient.bottom - rcClient.right;
             UpdateWindow(hwnd);
         }
 
@@ -450,9 +452,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
             if(valueToolBar==0)
             {
-                SetWindowPos(hEdit, NULL, 0, iToolHeight, rcClient.right, iEditHeight, SWP_NOZORDER);
-            }else{
-                SetWindowPos(hEdit, NULL, 0, rcClient.bottom, rcClient.right, iEditHeight, SWP_NOZORDER);
+                SetWindowPos(hEdit, NULL, 0, iToolHeight, rcClient.right, iEditHeight, NULL);
+            }if(valueToolBar == 1){
+                SetWindowPos(hEdit, NULL, 0, 0, rcClient.right, rcClient.bottom, NULL);
             }
             UpdateWindow(hwnd);
         }
