@@ -16,6 +16,7 @@ COLORREF g_rgbText = RGB(0, 0, 0);
 
 int valueStatusBar = 0;
 int valueToolBar = 0;
+int valueWordWrap = 0;
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
@@ -296,9 +297,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         g_hfFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 
-        hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL |
-                               ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE, 0, 0, 100, 100,
-                               hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
+        if(valueWordWrap == 0)
+        {
+            hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL
+            | WS_VSCROLL | ES_MULTILINE, 0, 0, 100, 100,
+            hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
+            SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+        }
+        if(valueWordWrap == 1)
+        {
+            hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL
+            | WS_VSCROLL | ES_AUTOHSCROLL | WS_HSCROLL | ES_MULTILINE, 0, 0, 100, 100,
+            hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
+            SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+        }
+
+        if(valueWordWrap == 0 && valueWordWrap == 1)
+        {
+            SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
+        }
 
         if(hEdit == NULL)
             MessageBox(hwnd, "Could not create IDC_MAIN_EDIT", "Error", MB_RETRYCANCEL | MB_ICONSTOP);
@@ -530,9 +547,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 {
                     if(valueToolBar == 0)
                     {
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
                         valueToolBar = 1;
                     }else if(valueToolBar == 1)
                     {
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
                         valueToolBar = 0;
                     }
                     InvalidateRect(hwnd, NULL, TRUE);
@@ -568,21 +589,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                     InvalidateRect(hwnd, NULL, TRUE);
                     UpdateWindow(hwnd);
                 }
+                break;
             case ID_VIEW_WORDWRAP:
-                //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WS_, 0, 0);
-                /*
                 {
-                    int valueWordWrap;
                     if(valueWordWrap == 0){
-                        SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, ES_WANTRETURN, 0, 0);
                         valueWordWrap = 1;
-                    }else{
+                    }else if(valueWordWrap == 1){
                         valueWordWrap = 0;
                     }
-
+                    InvalidateRect(hwnd, NULL, TRUE);
+                    UpdateWindow(hwnd);
                 }
-                */
-                UpdateWindow(hwnd);
                 break;
             case ID_VIEW_DEBUGWINDOW:
                 {
