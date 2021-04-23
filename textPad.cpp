@@ -85,6 +85,41 @@ BOOL SaveTextFileFromEdit(HWND hEdit, LPCTSTR pszFileName)
     return bSuccess;
 }
 
+BOOL WordWrap(HWND hEdit, LPCTSTR pszFileName)
+{
+    HANDLE hFile;
+    BOOL bSuccess = FALSE;
+
+    hFile = CreateFile(pszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    if(hFile != INVALID_HANDLE_VALUE)
+    {
+        DWORD dwFileSize;
+        GetWindowTextLength(hEdit);
+
+        dwFileSize = GetFileSize(hFile, NULL);
+        if(dwFileSize != 0xFFFFFFFF)
+        {
+            LPSTR pszFileText;
+            pszFileText = (LPSTR)GlobalAlloc(GPTR, dwFileSize + 1);
+
+            if(pszFileText != NULL)
+            {
+                DWORD dwRead;
+
+                if(ReadFile(hFile, pszFileText, dwFileSize, &dwRead, NULL))
+                   {
+                       pszFileText[dwFileSize] = 0;
+                       if(SetWindowText(hEdit, pszFileText))
+                            bSuccess = TRUE;
+                            SetWindowText(hEdit, pszFileText);
+                   }
+                   GlobalFree(pszFileText);
+            }
+        }
+    }
+    return bSuccess;
+}
+
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch(msg)
@@ -205,6 +240,14 @@ void DoFileSaveOnly(HWND hwnd)
 
             SetWindowText(hwnd, szFileName);
         }
+    }
+}
+
+void DoWordWrap(HWND hwnd)
+{
+    if(WordWrap(hwnd, LPCTSTR pszFileName))
+    {
+        SetWindowText(hwnd, pszFileName);
     }
 }
 
