@@ -314,6 +314,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
             //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
         }
+        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+        InvalidateRect(hwnd, NULL, TRUE);
         UpdateWindow(hwnd);
 
         if(hEdit == NULL)
@@ -599,7 +601,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
                     SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
                     SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
-                    //InvalidateRect(hwnd, NULL, TRUE);
+                    InvalidateRect(hwnd, NULL, TRUE);
                     UpdateWindow(hwnd);
                 }
                 break;
