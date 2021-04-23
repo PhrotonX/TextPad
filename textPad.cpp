@@ -85,27 +85,6 @@ BOOL SaveTextFileFromEdit(HWND hEdit, LPCTSTR pszFileName)
     return bSuccess;
 }
 
-BOOL WordWrap(HWND hEdit)
-{
-    DWORD dwTextLenght;
-    dwTextLenght = GetWindowTextLenght;
-
-    if(dwTextLenght > 0)
-    {
-        LPSTR pszTextLenght;
-        DWORD dwBufferSize = dwTextLenght + 1;
-
-        //pszTextLenght = (HGLOBAL)GlobalAlloc(GPTR, dwBufferSize);
-        pszTextLenght = GetWindowTextLength(hEdit);
-        if(pszTextLenght != NULL)
-        {
-            GetWindowTextLength(hEdit);
-            DWORD dwPrintText;
-            SetWindowText(hEdit, pszTextLenght);
-        }
-    }
-}
-
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch(msg)
