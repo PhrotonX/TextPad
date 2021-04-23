@@ -85,6 +85,27 @@ BOOL SaveTextFileFromEdit(HWND hEdit, LPCTSTR pszFileName)
     return bSuccess;
 }
 
+BOOL WordWrap(HWND hEdit)
+{
+    DWORD dwTextLenght;
+    dwTextLenght = GetWindowTextLenght;
+
+    if(dwTextLenght > 0)
+    {
+        LPSTR pszTextLenght;
+        DWORD dwBufferSize = dwTextLenght + 1;
+
+        //pszTextLenght = (HGLOBAL)GlobalAlloc(GPTR, dwBufferSize);
+        pszTextLenght = GetWindowTextLength(hEdit);
+        if(pszTextLenght != NULL)
+        {
+            GetWindowTextLength(hEdit);
+            DWORD dwPrintText;
+            SetWindowText(hEdit, pszTextLenght);
+        }
+    }
+}
+
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch(msg)
@@ -599,8 +620,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                         valueWordWrap = 0;
                     }
 
-                    SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
-                    SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
+                    GetWindowTextLength(hwnd);
+                    //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+                    //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
                     InvalidateRect(hwnd, NULL, TRUE);
                     UpdateWindow(hwnd);
                 }
