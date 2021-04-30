@@ -243,14 +243,6 @@ void DoFileSaveOnly(HWND hwnd)
     }
 }
 
-void DoWordWrap(HWND hwnd)
-{
-    if(WordWrap(hwnd, LPCTSTR pszFileName))
-    {
-        SetWindowText(hwnd, pszFileName);
-    }
-}
-
 void DoSelectFont(HWND hwnd)
 {
     CHOOSEFONT cf = { sizeof(CHOOSEFONT) };
@@ -340,21 +332,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         g_hfFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 
-        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+
         if(valueWordWrap == 0)
         {
-            //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
             hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL
             | WS_VSCROLL | ES_MULTILINE, 0, 0, 100, 100,
             hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
+            //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
             //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
         }else
         if(valueWordWrap == 1)
         {
-            //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
             hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOVSCROLL
             | WS_VSCROLL | ES_AUTOHSCROLL | WS_HSCROLL, 0, 0, 100, 100,
             hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
+            //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
             //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
         }
         //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
@@ -641,10 +633,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                     }else if(valueWordWrap == 1){
                         valueWordWrap = 0;
                     }
-
-                    GetWindowTextLength(hwnd);
-                    //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
-                    //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
+                    SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, (LPARAM)EM_SETHANDLE);
                     InvalidateRect(hwnd, NULL, TRUE);
                     UpdateWindow(hwnd);
                 }
@@ -762,6 +751,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         {
             if (!TranslateAccelerator(hwnd, hAccel, &Msg))
             {
+                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
                 TranslateMessage(&Msg);
                 DispatchMessage(&Msg);
             }
