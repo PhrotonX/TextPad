@@ -338,18 +338,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL
             | WS_VSCROLL | ES_MULTILINE, 0, 0, 100, 100,
             hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
-            //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
-            //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
+            SendMessage(hwnd, EM_SETHANDLE, 0, 0);
+            SendMessage(hwnd, WM_SETTEXT, 0, 0);
         }else
         if(valueWordWrap == 1)
         {
             hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOVSCROLL
             | WS_VSCROLL | ES_AUTOHSCROLL | WS_HSCROLL, 0, 0, 100, 100,
             hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
-            //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
-            //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
+            SendMessage(hwnd, EM_SETHANDLE, 0, 0);
+            SendMessage(hwnd, WM_SETTEXT, 0, 0);
         }
-        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+        SendMessage(hwnd, EM_SETWORDBREAKPROC, 0, 0);
         InvalidateRect(hwnd, NULL, TRUE);
         UpdateWindow(hwnd);
 
@@ -630,10 +630,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 {
                     if(valueWordWrap == 0){
                         valueWordWrap = 1;
-                    }else if(valueWordWrap == 1){
+                    }if(valueWordWrap == 1){
                         valueWordWrap = 0;
                     }
-                    SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, (LPARAM)EM_SETHANDLE);
+                    SendMessage(hwnd, EM_GETHANDLE, 0, 0);
+                    SendMessage(hwnd, WM_GETTEXT, 0, 0);
                     InvalidateRect(hwnd, NULL, TRUE);
                     UpdateWindow(hwnd);
                 }
