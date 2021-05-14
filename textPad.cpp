@@ -338,18 +338,20 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL
             | WS_VSCROLL | ES_MULTILINE, 0, 0, 100, 100,
             hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
-            SendMessage(hwnd, EM_SETHANDLE, 0, 0);
-            SendMessage(hwnd, WM_SETTEXT, 0, 0);
+            //SendMessage(hwnd, EM_SETHANDLE, 0, 0);
+            //SendMessage(hwnd, WM_SETTEXT, 0, 0);
+            SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_SETTEXT, 0, 0);
         }else
         if(valueWordWrap == 1)
         {
             hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOVSCROLL
             | WS_VSCROLL | ES_AUTOHSCROLL | WS_HSCROLL, 0, 0, 100, 100,
             hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
-            SendMessage(hwnd, EM_SETHANDLE, 0, 0);
-            SendMessage(hwnd, WM_SETTEXT, 0, 0);
+            //SendMessage(hwnd, EM_SETHANDLE, 0, 0);
+            //SendMessage(hwnd, WM_SETTEXT, 0, 0);
+            SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_SETTEXT, 0, 0);
         }
-        SendMessage(hwnd, EM_SETWORDBREAKPROC, 0, 0);
+        //SendMessage(hwnd, EM_SETWORDBREAKPROC, 0, 0);
         InvalidateRect(hwnd, NULL, TRUE);
         UpdateWindow(hwnd);
 
@@ -450,6 +452,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         break;
     }
     case WM_SIZE: {
+
         HWND hEdit;
         RECT rcClient;
         int iEditHeight;
@@ -511,7 +514,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             }
             UpdateWindow(hwnd);
         }
-
         break;
     }
     case WM_CLOSE: {
@@ -594,12 +596,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                     }
                     InvalidateRect(hwnd, NULL, TRUE);
                     UpdateWindow(hwnd);
+                    SendMessage(hwnd, WM_SIZE, 0, 0);
                 }
                 break;
             case ID_VIEW_STATUSBAR:
                 {
+                    //HMENU hMenu = (HMENU)MAKEINTRESOURCE(IDR_MENU1);
+                    HMENU hMenu = (HMENU)IDR_MENU1;
                 /*
-                HMENU hMenu = (HMENU)MAKEINTRESOURCE(IDR_MENU1);
+
                 int valueStatusBar;
 
                 if(valueStatusBar == 0)
@@ -611,12 +616,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 */
                 if(valueStatusBar == 0)
                 {
-                    SendDlgItemMessage(hwnd, ID_VIEW_STATUSBAR, MF_UNCHECKED | MF_BYPOSITION, 0, 0);
+                    CheckMenuItem(hMenu, ID_VIEW_STATUSBAR, MF_BYPOSITION | MF_CHECKED);
+                    //SendDlgItemMessage(hwnd, ID_VIEW_STATUSBAR, MF_UNCHECKED | MF_BYPOSITION, 0, 0);
                     SendMessage(hwnd, WS_MAXIMIZE, 0, 0);
                     SendMessage(hwnd, WS_DLGFRAME, 0, 0);
                     valueStatusBar = 1;
                 }else{
-                    SendDlgItemMessage(hwnd, ID_VIEW_STATUSBAR, MF_CHECKED | MF_BYPOSITION, 0, 0);
+                    CheckMenuItem(hMenu, ID_VIEW_STATUSBAR, MF_BYPOSITION | MF_UNCHECKED);
+                    //SendDlgItemMessage(hwnd, ID_VIEW_STATUSBAR, MF_CHECKED | MF_BYPOSITION, 0, 0);
                     SendMessage(hwnd, WS_MAXIMIZE, 0, 0);
                     SendMessage(hwnd, WS_DLGFRAME, 0, 0);
                     valueStatusBar = 0;
@@ -624,6 +631,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
                     InvalidateRect(hwnd, NULL, TRUE);
                     UpdateWindow(hwnd);
+                    SendMessage(hwnd, WM_SIZE, 0, 0);
                 }
                 break;
             case ID_VIEW_WORDWRAP:
@@ -633,10 +641,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                     }if(valueWordWrap == 1){
                         valueWordWrap = 0;
                     }
-                    SendMessage(hwnd, EM_GETHANDLE, 0, 0);
-                    SendMessage(hwnd, WM_GETTEXT, 0, 0);
+                    //SendMessage(hwnd, EM_GETHANDLE, 0, 0);
+                    //SendMessage(hwnd, WM_GETTEXT, 0, 0);
+                    SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_GETTEXT, 0, 0);
                     InvalidateRect(hwnd, NULL, TRUE);
                     UpdateWindow(hwnd);
+                    //SendMessage(hwnd, WM_SETTEXT, 0, 0);
+                    SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_SETTEXT, 0, 0);
+                    SendMessage(hwnd, WM_SIZE, 0, 0);
                 }
                 break;
             case ID_VIEW_DEBUGWINDOW:
@@ -656,6 +668,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_VIEW_REFRESHWINDOW:
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
+                SendMessage(hwnd, WM_SIZE, 0, 0);
                 break;
             //FORMAT
             case ID_FORMAT_FONT:
