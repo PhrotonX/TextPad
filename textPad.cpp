@@ -10,6 +10,8 @@ const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT       101
 #define IDC_MAIN_TOOLBAR    102
 #define IDC_MAIN_STATUS     103
+#define WM_MOUSEHOVER       0x02A1
+//#define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))  //STATUS BAR INFO
 
 HFONT g_hfFont = NULL;
 COLORREF g_rgbText = RGB(0, 0, 0);
@@ -17,6 +19,50 @@ COLORREF g_rgbText = RGB(0, 0, 0);
 int valueStatusBar = 0;
 int valueToolBar = 0;
 int valueWordWrap = 0;
+class mouseTrackEvents{
+    bool m_bMouseTracking;
+public:
+    /*
+    MouseTrackEvents() : m_bMouseTracking(false)
+    {
+    }
+    */
+    void OnMouseMove(HWND hwnd)
+    {
+        if (!m_bMouseTracking)
+        {
+            // Enable mouse tracking.
+            TRACKMOUSEEVENT tme;
+            tme.cbSize = sizeof(tme);
+            tme.hwndTrack = hwnd;
+            tme.dwFlags = TME_HOVER | TME_LEAVE;
+            tme.dwHoverTime = HOVER_DEFAULT;
+            TrackMouseEvent(&tme);
+            m_bMouseTracking = true;
+        }
+    }
+    void Reset(HWND hwnd)
+    {
+        m_bMouseTracking = false;
+    }
+
+    void foo();
+};
+
+void mouseTrackEvents::foo(){
+ UINT GetMouseHoverTime()
+        {
+            UINT msec;
+            if (SystemParametersInfo(SPI_GETMOUSEHOVERTIME, 0, &msec, 0))
+            {
+                return msec;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+}
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
@@ -317,6 +363,7 @@ HWND WINAPI InitializeHotkey(HWND hwndDlg)
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+    mouseTrackEvents mouseTrackEventsObject;
     switch(msg){
     case WM_CREATE: {
         HFONT hfDefault;
@@ -516,6 +563,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         }
         break;
     }
+    case WM_MOUSEMOVE:
+        //mouseTrack.OnMouseMove(hwnd);  // Start tracking.
+        mouseTrackEventsObject.OnMouseMove(hwnd);
+        return 0;
+    case WM_MOUSELEAVE:
+        mouseTrackEventsObject.Reset(hwnd);
+        return 0;
+    case WM_MOUSEHOVER:
+        SendDlgItemMessage(hwnd, ID_FILE_NEW, SB_SETTEXT, 1, (LPARAM)"Create a new file");
+        mouseTrackEventsObject.Reset(hwnd);
+        return 0;
     case WM_CLOSE: {
         int ret = MessageBox(hwnd, "Are you sure do you want to quit?", "Warning", MB_ICONWARNING | MB_YESNO);
         if(ret == IDYES)
@@ -757,6 +815,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
+    /*NOTIFYICONDATA IconData = {0};
+
+    IconData.cbSize = sizeof(IconData);
+    IconData.hWnd   = hwndNI;
+    IconData.uFlags = NIF_INFO;
+
+    HRESULT hr = StringCchCopy(IconData.szInfo,
+                               ARRAYSIZE(IconData.szInfo),
+                               TEXT("Your message text goes here."));
+
+    if(FAILED(hr))
+    {
+    }
+    IconData.uTimeout = 15000; // in milliseconds
+
+    Shell_NotifyIcon(NIM_MODIFY, &IconData);
+*/
     ShowWindow(hwnd, nCmdShow);
     ShowWindow( GetConsoleWindow(), SW_HIDE);
     UpdateWindow(hwnd);
