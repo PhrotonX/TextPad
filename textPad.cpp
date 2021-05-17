@@ -14,6 +14,10 @@ const char g_szClassName[] = "textPad";
 HFONT g_hfFont = NULL;
 COLORREF g_rgbText = RGB(0, 0, 0);
 
+int valueStatusBar = 0;
+int valueToolBar = 0;
+int valueWordWrap = 0;
+
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
     HANDLE hFile;
@@ -81,6 +85,41 @@ BOOL SaveTextFileFromEdit(HWND hEdit, LPCTSTR pszFileName)
     return bSuccess;
 }
 
+BOOL WordWrap(HWND hEdit, LPCTSTR pszFileName)
+{
+    HANDLE hFile;
+    BOOL bSuccess = FALSE;
+
+    hFile = CreateFile(pszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    if(hFile != INVALID_HANDLE_VALUE)
+    {
+        DWORD dwFileSize;
+        GetWindowTextLength(hEdit);
+
+        dwFileSize = GetFileSize(hFile, NULL);
+        if(dwFileSize != 0xFFFFFFFF)
+        {
+            LPSTR pszFileText;
+            pszFileText = (LPSTR)GlobalAlloc(GPTR, dwFileSize + 1);
+
+            if(pszFileText != NULL)
+            {
+                DWORD dwRead;
+
+                if(ReadFile(hFile, pszFileText, dwFileSize, &dwRead, NULL))
+                   {
+                       pszFileText[dwFileSize] = 0;
+                       if(SetWindowText(hEdit, pszFileText))
+                            bSuccess = TRUE;
+                            SetWindowText(hEdit, pszFileText);
+                   }
+                   GlobalFree(pszFileText);
+            }
+        }
+    }
+    return bSuccess;
+}
+
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch(msg)
@@ -88,7 +127,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_INITDIALOG:
         return TRUE;
         break;
-    case WM_DESTROY:
+    case WM_CLOSE:
         EndDialog(hwnd, WM_CLOSE);
         break;
     case WM_COMMAND:
@@ -293,9 +332,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         g_hfFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 
-        hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL |
-                               ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE, 0, 0, 100, 100,
-                               hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
+
+        if(valueWordWrap == 0)
+        {
+            hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_AUTOVSCROLL
+            | WS_VSCROLL | ES_MULTILINE, 0, 0, 100, 100,
+            hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
+            //SendMessage(hwnd, EM_SETHANDLE, 0, 0);
+            //SendMessage(hwnd, WM_SETTEXT, 0, 0);
+            SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_SETTEXT, 0, 0);
+        }else
+        if(valueWordWrap == 1)
+        {
+            hEdit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "", WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOVSCROLL
+            | WS_VSCROLL | ES_AUTOHSCROLL | WS_HSCROLL, 0, 0, 100, 100,
+            hwnd, (HMENU)IDC_MAIN_EDIT, GetModuleHandle(NULL), NULL);
+            //SendMessage(hwnd, EM_SETHANDLE, 0, 0);
+            //SendMessage(hwnd, WM_SETTEXT, 0, 0);
+            SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_SETTEXT, 0, 0);
+        }
+        //SendMessage(hwnd, EM_SETWORDBREAKPROC, 0, 0);
+        InvalidateRect(hwnd, NULL, TRUE);
+        UpdateWindow(hwnd);
 
         if(hEdit == NULL)
             MessageBox(hwnd, "Could not create IDC_MAIN_EDIT", "Error", MB_RETRYCANCEL | MB_ICONSTOP);
@@ -383,6 +441,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         hStatus = CreateWindowEx(0, STATUSCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0, hwnd, (HMENU)IDC_MAIN_STATUS, GetModuleHandle(NULL), NULL);
 
+        if(hStatus == NULL)
+            MessageBox(hwnd, "Could not create Status Bar", "Error", MB_OK | MB_ICONERROR);
+
         SendMessage(hStatus, SB_SETPARTS, sizeof(statwidhts)/sizeof(int), (LPARAM)statwidhts);
         SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)"TextPad");
 
@@ -391,6 +452,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         break;
     }
     case WM_SIZE: {
+
         HWND hEdit;
         RECT rcClient;
         int iEditHeight;
@@ -403,22 +465,55 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         RECT rcStatus;
         int iStatusHeight;
 
-
-        hTool = GetDlgItem(hwnd, IDC_MAIN_TOOLBAR);
-        SendMessage(hTool, TB_AUTOSIZE, 0, 0);
-        GetWindowRect(hTool, &rcTool);
-        iToolHeight = rcTool.bottom - rcTool.top;
-
-        hStatus = GetDlgItem(hwnd, IDC_MAIN_STATUS);
-        SendMessage(hStatus, WM_SIZE, 0, 0);
-        GetWindowRect(hStatus, &rcStatus);
-        iStatusHeight = rcStatus.bottom - rcStatus.top;
+        if(valueToolBar == 0)
+        {
+            hTool = GetDlgItem(hwnd, IDC_MAIN_TOOLBAR);
+            SendMessage(hTool, TB_AUTOSIZE, 0, 0);
+            GetWindowRect(hTool, &rcTool);
+            iToolHeight = rcTool.bottom - rcTool.top;
+            UpdateWindow(hwnd);
+        }
+        if(valueStatusBar == 0)
+        {
+            hStatus = GetDlgItem(hwnd, IDC_MAIN_STATUS);
+            SendMessage(hStatus, WM_SIZE, 0, 0);
+            GetWindowRect(hStatus, &rcStatus);
+            iStatusHeight = rcStatus.bottom - rcStatus.top;
+            UpdateWindow(hwnd);
+        }
 
         GetClientRect(hwnd, &rcClient);
-        iEditHeight = rcClient.bottom - iToolHeight - iStatusHeight;
-        hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
-        SetWindowPos(hEdit, NULL, 0, iToolHeight, rcClient.right, iEditHeight, SWP_NOZORDER);
+        GetWindowRect(hwnd, &rcStatus);
+        GetWindowRect(hwnd, &rcTool);
+        if(valueStatusBar == 1 && valueToolBar == 0){
+            GetWindowRect(hwnd, &rcTool);
+            iEditHeight = rcClient.bottom - iToolHeight;
+            UpdateWindow(hwnd);
+        }if(valueToolBar == 1 && valueStatusBar == 0){
+            GetWindowRect(hwnd, &rcStatus);
+            iEditHeight = rcClient.bottom - iStatusHeight;
+            UpdateWindow(hwnd);
+        }if(valueToolBar == 0 && valueStatusBar == 0){
+            iEditHeight = rcClient.bottom - iToolHeight - iStatusHeight;
+            UpdateWindow(hwnd);
+        }if(valueToolBar == 1 && valueStatusBar == 1){
+            iEditHeight = rcClient.bottom - rcClient.right;
+            UpdateWindow(hwnd);
+        }
 
+        InvalidateRect(hwnd, NULL, TRUE);
+        UpdateWindow(hwnd);
+        if(UpdateWindow(hwnd))
+        {
+            hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
+            if(valueToolBar==0)
+            {
+                SetWindowPos(hEdit, NULL, 0, iToolHeight, rcClient.right, iEditHeight, NULL);
+            }if(valueToolBar == 1){
+                SetWindowPos(hEdit, NULL, 0, 0, rcClient.right, rcClient.bottom, NULL);
+            }
+            UpdateWindow(hwnd);
+        }
         break;
     }
     case WM_CLOSE: {
@@ -485,6 +580,96 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             case ID_EDIT_CLEAR:
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_CLEAR, 0, 0);
                 break;
+            //VIEW
+            case ID_VIEW_TOOLBAR:
+                {
+                    if(valueToolBar == 0)
+                    {
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
+                        valueToolBar = 1;
+                    }else if(valueToolBar == 1)
+                    {
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+                        //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETHANDLE, 0, 0);
+                        valueToolBar = 0;
+                    }
+                    InvalidateRect(hwnd, NULL, TRUE);
+                    UpdateWindow(hwnd);
+                    SendMessage(hwnd, WM_SIZE, 0, 0);
+                }
+                break;
+            case ID_VIEW_STATUSBAR:
+                {
+                    //HMENU hMenu = (HMENU)MAKEINTRESOURCE(IDR_MENU1);
+                    HMENU hMenu = (HMENU)IDR_MENU1;
+                /*
+
+                int valueStatusBar;
+
+                if(valueStatusBar == 0)
+                {
+                    SetMenuItemInfo(hMenu, ID_VIEW_STATUSBAR, FALSE, MF_UNCHECKED);
+                }
+                //CheckMenuItem(hMenu, MF_BYCOMMAND | MF_UNCHECKED, ID_VIEW_STATUSBAR);
+                UpdateWindow(hwnd);
+                */
+                if(valueStatusBar == 0)
+                {
+                    CheckMenuItem(hMenu, ID_VIEW_STATUSBAR, MF_BYPOSITION | MF_CHECKED);
+                    //SendDlgItemMessage(hwnd, ID_VIEW_STATUSBAR, MF_UNCHECKED | MF_BYPOSITION, 0, 0);
+                    SendMessage(hwnd, WS_MAXIMIZE, 0, 0);
+                    SendMessage(hwnd, WS_DLGFRAME, 0, 0);
+                    valueStatusBar = 1;
+                }else{
+                    CheckMenuItem(hMenu, ID_VIEW_STATUSBAR, MF_BYPOSITION | MF_UNCHECKED);
+                    //SendDlgItemMessage(hwnd, ID_VIEW_STATUSBAR, MF_CHECKED | MF_BYPOSITION, 0, 0);
+                    SendMessage(hwnd, WS_MAXIMIZE, 0, 0);
+                    SendMessage(hwnd, WS_DLGFRAME, 0, 0);
+                    valueStatusBar = 0;
+                }
+
+                    InvalidateRect(hwnd, NULL, TRUE);
+                    UpdateWindow(hwnd);
+                    SendMessage(hwnd, WM_SIZE, 0, 0);
+                }
+                break;
+            case ID_VIEW_WORDWRAP:
+                {
+                    if(valueWordWrap == 0){
+                        valueWordWrap = 1;
+                    }if(valueWordWrap == 1){
+                        valueWordWrap = 0;
+                    }
+                    //SendMessage(hwnd, EM_GETHANDLE, 0, 0);
+                    //SendMessage(hwnd, WM_GETTEXT, 0, 0);
+                    SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_GETTEXT, 0, 0);
+                    InvalidateRect(hwnd, NULL, TRUE);
+                    UpdateWindow(hwnd);
+                    //SendMessage(hwnd, WM_SETTEXT, 0, 0);
+                    SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_SETTEXT, 0, 0);
+                    SendMessage(hwnd, WM_SIZE, 0, 0);
+                }
+                break;
+            case ID_VIEW_DEBUGWINDOW:
+                {
+                    int valueDebugWindow;
+                    if(valueDebugWindow == 0)
+                    {
+                        ShowWindow(GetConsoleWindow(), SW_SHOW);
+                        valueDebugWindow = 1;
+                    }if(valueDebugWindow == 1){
+                        ShowWindow(GetConsoleWindow(), SW_HIDE);
+                        valueDebugWindow = 0;
+                    }
+                }
+                ShowWindow(GetConsoleWindow(), SW_SHOW);
+                break;
+            case ID_VIEW_REFRESHWINDOW:
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+                SendMessage(hwnd, WM_SIZE, 0, 0);
+                break;
             //FORMAT
             case ID_FORMAT_FONT:
                 DoSelectFont(hwnd);
@@ -535,6 +720,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WNDCLASSEX wc;
     HWND hwnd;
     MSG Msg;
+    bool ret;
 
     wc.cbSize           =   sizeof(WNDCLASSEX);
     wc.style            =   0;
@@ -564,13 +750,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
+    HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
+    if(hAccel == NULL)
+    {
+        MessageBox(hwnd, "Could not create accelerators", "Error", MB_OK | MB_ICONERROR);
+        return 0;
+    }
+
     ShowWindow(hwnd, nCmdShow);
     ShowWindow( GetConsoleWindow(), SW_HIDE);
     UpdateWindow(hwnd);
 
-    while(GetMessage(&Msg, NULL, 0, 0) > 0){
-        TranslateMessage(&Msg);
-        DispatchMessage(&Msg);
-    }
+    while (GetMessage(&Msg, NULL, 0, 0))
+        {
+            if (!TranslateAccelerator(hwnd, hAccel, &Msg))
+            {
+                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_GETHANDLE, 0, 0);
+                TranslateMessage(&Msg);
+                DispatchMessage(&Msg);
+            }
+        }
     return Msg.wParam;
 }
