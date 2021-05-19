@@ -4,6 +4,7 @@
 #include <commctrl.h>
 #include <string.h>
 #include <iostream>
+#include <strsafe.h>
 //#include <winuser.h>
 
 const char g_szClassName[] = "textPad";
@@ -814,11 +815,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         MessageBox(hwnd, "Could not create accelerators", "Error", MB_OK | MB_ICONERROR);
         return 0;
     }
-
-    /*NOTIFYICONDATA IconData = {0};
+// PATHETIC COPY-PASTED CODE FROM THE INTERNET
+/*
+    NOTIFYICONDATA IconData = {0};
 
     IconData.cbSize = sizeof(IconData);
-    IconData.hWnd   = hwndNI;
+    IconData.hWnd   = hwnd;
     IconData.uFlags = NIF_INFO;
 
     HRESULT hr = StringCchCopy(IconData.szInfo,
