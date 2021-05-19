@@ -46,10 +46,10 @@ public:
         m_bMouseTracking = false;
     }
 
-    void foo();
+    //void foo(HWND hwnd);
 };
-
-void mouseTrackEvents::foo(){
+/*
+void mouseTrackEvents::foo(HWND hwnd){
  UINT GetMouseHoverTime()
         {
             UINT msec;
@@ -62,7 +62,7 @@ void mouseTrackEvents::foo(){
                 return 0;
             }
         }
-}
+}*/
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
@@ -366,7 +366,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
     mouseTrackEvents mouseTrackEventsObject;
     switch(msg){
     case WM_CREATE: {
-        HFONT hfDefault;
+        //HFONT hfDefault;
         HWND hEdit;
         HFONT hFont;
 
@@ -778,7 +778,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WNDCLASSEX wc;
     HWND hwnd;
     MSG Msg;
-    bool ret;
+    //bool ret;
 
     wc.cbSize           =   sizeof(WNDCLASSEX);
     wc.style            =   0;
