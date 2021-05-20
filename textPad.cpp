@@ -7,6 +7,7 @@
 //#include <strsafe.h>
 //#include <winuser.h>
 #include <tchar.h>
+//#include <windowsx.h>
 
 const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT       101
@@ -24,16 +25,15 @@ int valueWordWrap = 0;
 class mouseTrackEvents{
     bool m_bMouseTracking;
 public:
-    /*
-    MouseTrackEvents() : m_bMouseTracking(false)
+
+    mouseTrackEvents() : m_bMouseTracking(false)
     {
     }
-    */
+
     void OnMouseMove(HWND hwnd)
     {
         if (!m_bMouseTracking)
         {
-            // Enable mouse tracking.
             TRACKMOUSEEVENT tme;
             tme.cbSize = sizeof(tme);
             tme.hwndTrack = hwnd;
@@ -366,6 +366,16 @@ HWND WINAPI InitializeHotkey(HWND hwndDlg)
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
     mouseTrackEvents mouseTrackEventsObject;
+
+    //
+    enum TimerId { TimerId_MouseHover = 1 };
+    static const UINT HoverTimeoutInMs = 1000;
+    static int PrevX = INT_MIN;
+    static int PrevY = INT_MIN;
+    static bool IsMouseOutside = true;
+    static bool IsMouseHovered = false;
+    //
+
     switch(msg){
     case WM_CREATE: {
         //HFONT hfDefault;
@@ -565,17 +575,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         }
         break;
     }
+/*
     case WM_MOUSEMOVE:
-        //mouseTrack.OnMouseMove(hwnd);  // Start tracking.
         mouseTrackEventsObject.OnMouseMove(hwnd);
         return 0;
     case WM_MOUSELEAVE:
         mouseTrackEventsObject.Reset(hwnd);
         return 0;
     case WM_MOUSEHOVER:
-        SendDlgItemMessage(hwnd, ID_FILE_NEW, SB_SETTEXT, 1, (LPARAM)"Create a new file");
+        SendDlgItemMessage(hwnd, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM)"Create a new file");
         mouseTrackEventsObject.Reset(hwnd);
         return 0;
+        */
     case WM_CLOSE: {
         int ret = MessageBox(hwnd, "Are you sure do you want to quit?", "Warning", MB_ICONWARNING | MB_YESNO);
         if(ret == IDYES)
@@ -596,6 +607,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             //FILE
             case ID_FILE_NEW:
                 SetDlgItemText(hwnd, IDC_MAIN_EDIT, "");
+                switch(msg)
+                {
+                    case WM_MOUSEMOVE:
+                        mouseTrackEventsObject.OnMouseMove(hwnd);
+                        return 0;
+                    case WM_MOUSELEAVE:
+                        mouseTrackEventsObject.Reset(hwnd);
+                        return 0;
+                    case WM_MOUSEHOVER:
+                        SendDlgItemMessage(hwnd, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM)"Create a new file");
+                        mouseTrackEventsObject.OnMouseMove(hwnd);
+                        return 0;
+                }
                 break;
             case ID_FILE_OPEN:
                 DoFileOpen(hwnd);
