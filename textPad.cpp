@@ -4,8 +4,9 @@
 #include <commctrl.h>
 #include <string.h>
 #include <iostream>
-#include <strsafe.h>
+//#include <strsafe.h>
 //#include <winuser.h>
+#include <tchar.h>
 
 const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT       101
@@ -834,6 +835,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     Shell_NotifyIcon(NIM_MODIFY, &IconData);
 */
+
+    HANDLE hIcon = LoadImage(0, _T("img/textPad_icon.ico"), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+    if(hIcon){
+        SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+
+        SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+    }
+
     ShowWindow(hwnd, nCmdShow);
     ShowWindow( GetConsoleWindow(), SW_HIDE);
     UpdateWindow(hwnd);
