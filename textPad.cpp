@@ -13,7 +13,7 @@ const char g_szClassName[] = "textPad";
 #define IDC_MAIN_TOOLBAR    102
 #define IDC_MAIN_STATUS     103
 #define WM_MOUSEHOVER       0x02A1
-//#define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))  //STATUS BAR INFO
+#define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))  //STATUS BAR INFO
 
 HFONT g_hfFont = NULL;
 COLORREF g_rgbText = RGB(0, 0, 0);
