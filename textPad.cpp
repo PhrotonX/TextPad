@@ -441,6 +441,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         tbb[0].fsState = TBSTATE_ENABLED;
         tbb[0].fsStyle = TBSTYLE_BUTTON;
         tbb[0].idCommand = ID_FILE_NEW;
+        tbb[0].fsStyle = TBSTYLE_TOOLTIPS;
 
         tbb[1].iBitmap = STD_FILEOPEN;
         tbb[1].fsState = TBSTATE_ENABLED;
