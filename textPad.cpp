@@ -442,6 +442,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         tbb[0].fsStyle = TBSTYLE_BUTTON;
         tbb[0].idCommand = ID_FILE_NEW;
         tbb[0].iString = IDS_TIPS_NEW;
+        SendDlgItemMessage(hwnd, IDS_TIPS_NEW, TB_SETMAXTEXTROWS, 18, 0);
+        SendDlgItemMessage(hwnd, IDS_TIPS_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
 
         tbb[1].iBitmap = STD_FILEOPEN;
         tbb[1].fsState = TBSTATE_ENABLED;
@@ -475,10 +477,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         tbb[7].fsStyle = TBSTYLE_BUTTON;
         tbb[7].idCommand = ID_EDIT_CLEAR;
 
-        //tbb[1].iBitmap = STD_FILEOPEN;
-        //tbb[1].fsState = TBSTATE_ENABLED;
         tbb[8].fsStyle = TBSTYLE_SEP;
-        //tbb[1].idCommand = ID_FILE_OPEN;
 
         tbb[9].iBitmap = STD_UNDO;
         tbb[9].fsState = TBSTATE_ENABLED;
@@ -608,7 +607,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             //FILE
             case ID_FILE_NEW:
                 SetDlgItemText(hwnd, IDC_MAIN_EDIT, "");
-                SendDlgItemMessage(hwnd, ID_FILE_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
+                //SendDlgItemMessage(hwnd, ID_FILE_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
+                /*
                 switch(msg)
                 {
                     case WM_MOUSEMOVE:
@@ -622,12 +622,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                         mouseTrackEventsObject.OnMouseMove(hwnd);
                         return 0;
                 }
+                */
                 break;
             case ID_FILE_OPEN:
                 DoFileOpen(hwnd);
                 break;
             case ID_FILE_SAVE:
-                //RegisterHotKey(hwnd, ID_FILE_SAVE, MOD_CONTROL, 0x53);
                 DoFileSaveOnly(hwnd);
                 break;
             case ID_FILE_SAVEAS:
