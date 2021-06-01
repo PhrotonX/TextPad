@@ -443,7 +443,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         tbb[0].idCommand = ID_FILE_NEW;
         tbb[0].iString = IDS_TIPS_NEW;
         SendDlgItemMessage(hwnd, IDS_TIPS_NEW, TB_SETMAXTEXTROWS, 18, 0);
-        SendDlgItemMessage(hwnd, IDS_TIPS_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
+        //SendDlgItemMessage(hwnd, IDS_TIPS_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
+        SendDlgItemMessage(hwnd, ID_FILE_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
 
         tbb[1].iBitmap = STD_FILEOPEN;
         tbb[1].fsState = TBSTATE_ENABLED;
