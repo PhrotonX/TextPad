@@ -66,6 +66,12 @@ void mouseTrackEvents::foo(HWND hwnd){
         }
 }*/
 
+void Invalidate(HWND window) {
+    RECT rect;
+    GetClientRect(window, &rect);
+    InvalidateRect(window, &rect, TRUE);
+}
+
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
     HANDLE hFile;
@@ -376,7 +382,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
     static bool IsMouseHovered = false;
     //
 
+    PAINTSTRUCT ps;
+    HDC dc;
+    RECT rect;
+    int i;
+
     switch(msg){
+    case WM_PAINT:
+        dc = BeginPaint(hwnd, &ps);
+        EndPaint(hwnd, &ps);
+        return 0;
     case WM_CREATE: {
         //HFONT hfDefault;
         HWND hEdit;
@@ -656,10 +671,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_PASTE, 0, 0);
                 break;
             case ID_EDIT_SELECTALL:
-                //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT,)
+                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETSEL, 0, -1);
+                return 0;
                 break;
             case ID_EDIT_UNDO:
-                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
+                if(SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_CANUNDO, 0, 0))
+                    SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
                 break;
             case ID_EDIT_REDO:
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
