@@ -22,6 +22,7 @@ COLORREF g_rgbText = RGB(0, 0, 0);
 int valueStatusBar = 0;
 int valueToolBar = 0;
 int valueWordWrap = 0;
+/*
 class mouseTrackEvents{
     bool m_bMouseTracking;
 public:
@@ -50,6 +51,7 @@ public:
 
     //void foo(HWND hwnd);
 };
+*/
 /*
 void mouseTrackEvents::foo(HWND hwnd){
  UINT GetMouseHoverTime()
@@ -371,16 +373,16 @@ HWND WINAPI InitializeHotkey(HWND hwndDlg)
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+    /*
     mouseTrackEvents mouseTrackEventsObject;
 
-    //
     enum TimerId { TimerId_MouseHover = 1 };
     static const UINT HoverTimeoutInMs = 1000;
     static int PrevX = INT_MIN;
     static int PrevY = INT_MIN;
     static bool IsMouseOutside = true;
     static bool IsMouseHovered = false;
-    //
+    */
 
     PAINTSTRUCT ps;
     HDC dc;
@@ -456,10 +458,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         tbb[0].fsState = TBSTATE_ENABLED;
         tbb[0].fsStyle = TBSTYLE_BUTTON;
         tbb[0].idCommand = ID_FILE_NEW;
-        tbb[0].iString = IDS_TIPS_NEW;
-        SendDlgItemMessage(hwnd, IDS_TIPS_NEW, TB_SETMAXTEXTROWS, 18, 0);
+        //tbb[0].iString = IDS_TIPS_NEW;
+        //SendDlgItemMessage(hwnd, IDS_TIPS_NEW, TB_SETMAXTEXTROWS, 18, 0);
         //SendDlgItemMessage(hwnd, IDS_TIPS_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
-        SendDlgItemMessage(hwnd, ID_FILE_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
+        //SendDlgItemMessage(hwnd, ID_FILE_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
 
         tbb[1].iBitmap = STD_FILEOPEN;
         tbb[1].fsState = TBSTATE_ENABLED;
@@ -576,7 +578,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             UpdateWindow(hwnd);
         }
 
-        InvalidateRect(hwnd, NULL, TRUE);
         UpdateWindow(hwnd);
         if(UpdateWindow(hwnd))
         {
@@ -589,6 +590,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             }
             UpdateWindow(hwnd);
         }
+        //InvalidateRect(hwnd, NULL, TRUE);
         break;
     }
 /*
@@ -814,6 +816,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         break;
     }
+    /*
     case WM_NOTIFY:{
         switch(((LPNMHDR)lParam)->code)
         {
@@ -833,6 +836,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             }
         }
     }
+    */
     default:
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }
@@ -842,6 +846,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
     WNDCLASSEX wc;
     HWND hwnd;
+    HWND hwndToolTips;
     MSG Msg;
     //bool ret;
 
@@ -879,26 +884,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         MessageBox(hwnd, "Could not create accelerators", "Error", MB_OK | MB_ICONERROR);
         return 0;
     }
-// PATHETIC COPY-PASTED CODE FROM THE INTERNET
-/*
-    NOTIFYICONDATA IconData = {0};
-
-    IconData.cbSize = sizeof(IconData);
-    IconData.hWnd   = hwnd;
-    IconData.uFlags = NIF_INFO;
-
-    HRESULT hr = StringCchCopy(IconData.szInfo,
-                               ARRAYSIZE(IconData.szInfo),
-                               TEXT("Your message text goes here."));
-
-    if(FAILED(hr))
-    {
-    }
-    IconData.uTimeout = 15000; // in milliseconds
-
-    Shell_NotifyIcon(NIM_MODIFY, &IconData);
-*/
-
     HANDLE hIcon = LoadImage(0, _T("img/textPad_icon.ico"), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
     if(hIcon){
         SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
