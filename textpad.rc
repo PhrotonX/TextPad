@@ -23,6 +23,8 @@ IDR_MENU1 MENU
         MENUITEM "&Save\tAlt+S", ID_FILE_SAVE
         MENUITEM "S&ave as...", ID_FILE_SAVEAS
         MENUITEM SEPARATOR
+        MENUITEM "&Print", 0
+        MENUITEM SEPARATOR
         MENUITEM "E&xit\tAlt+F4", ID_FILE_EXIT
     }
     POPUP "&Edit"
@@ -52,11 +54,6 @@ IDR_MENU1 MENU
     {
         MENUITEM "F&ont", ID_FORMAT_FONT
         MENUITEM "&Default Font", ID_FORMAT_DEFAULTFONT
-        MENUITEM SEPARATOR
-        MENUITEM "&Bold", ID_FONT_BOLD
-        MENUITEM "&Italics", ID_FONT_ITALICS
-        MENUITEM "&Underline", ID_FONT_UNDERLINE
-        MENUITEM "&Strikethrough", ID_FONT_STRIKETHROUGH
     }
     POPUP "&Help"
     {
@@ -79,7 +76,7 @@ STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VIS
 CAPTION "About TextPad"
 FONT 8, "Ms Shell Dlg"
 {
-    LTEXT           "Version 0.1.0.12-alpha build 340", IDC_STATIC, 7, 17, 170, 60, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Version 0.1.0.13-alpha build 421", IDC_STATIC, 7, 17, 170, 60, SS_LEFT, WS_EX_LEFT
     LTEXT           "TextPad, by Phroton", 0, 7, 7, 66, 9, SS_LEFT, WS_EX_LEFT
     PUSHBUTTON      "Check for Updates", ID_ABOUTDIALOG_CHECKFORUPDATES, 116, 74, 63, 14, 0, WS_EX_LEFT
     PUSHBUTTON      "View on GitHub", ID_ABOUTDIALOG_VIEWONGITHUB, 57, 74, 58, 14, 0, WS_EX_LEFT

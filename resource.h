@@ -5,6 +5,8 @@
 #define IDR_MENU1                               100
 #define IDD_ABOUTDIALOG                         101
 #define IDR_ACCELERATOR1                        102
+//#define IDS_TIPS_NEW                            200
+//#define IDM_NEW                                 300
 #define ID_ABOUTDIALOG_OK                       10000
 #define ID_ABOUTDIALOG_VIEWONGITHUB             10002
 #define ID_ABOUTDIALOG_CHECKFORUPDATES          10003

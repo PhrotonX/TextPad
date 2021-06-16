@@ -4,12 +4,17 @@
 #include <commctrl.h>
 #include <string.h>
 #include <iostream>
+//#include <strsafe.h>
 //#include <winuser.h>
+#include <tchar.h>
+//#include <windowsx.h>
 
 const char g_szClassName[] = "textPad";
 #define IDC_MAIN_EDIT       101
 #define IDC_MAIN_TOOLBAR    102
 #define IDC_MAIN_STATUS     103
+#define WM_MOUSEHOVER       0x02A1
+#define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))  //STATUS BAR INFO
 
 HFONT g_hfFont = NULL;
 COLORREF g_rgbText = RGB(0, 0, 0);
@@ -17,6 +22,57 @@ COLORREF g_rgbText = RGB(0, 0, 0);
 int valueStatusBar = 0;
 int valueToolBar = 0;
 int valueWordWrap = 0;
+/*
+class mouseTrackEvents{
+    bool m_bMouseTracking;
+public:
+
+    mouseTrackEvents() : m_bMouseTracking(false)
+    {
+    }
+
+    void OnMouseMove(HWND hwnd)
+    {
+        if (!m_bMouseTracking)
+        {
+            TRACKMOUSEEVENT tme;
+            tme.cbSize = sizeof(tme);
+            tme.hwndTrack = hwnd;
+            tme.dwFlags = TME_HOVER | TME_LEAVE;
+            tme.dwHoverTime = HOVER_DEFAULT;
+            TrackMouseEvent(&tme);
+            m_bMouseTracking = true;
+        }
+    }
+    void Reset(HWND hwnd)
+    {
+        m_bMouseTracking = false;
+    }
+
+    //void foo(HWND hwnd);
+};
+*/
+/*
+void mouseTrackEvents::foo(HWND hwnd){
+ UINT GetMouseHoverTime()
+        {
+            UINT msec;
+            if (SystemParametersInfo(SPI_GETMOUSEHOVERTIME, 0, &msec, 0))
+            {
+                return msec;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+}*/
+
+void Invalidate(HWND window) {
+    RECT rect;
+    GetClientRect(window, &rect);
+    InvalidateRect(window, &rect, TRUE);
+}
 
 BOOL LoadTextFileToEdit(HWND hEdit, LPCTSTR pszFileName)
 {
@@ -317,9 +373,29 @@ HWND WINAPI InitializeHotkey(HWND hwndDlg)
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+    /*
+    mouseTrackEvents mouseTrackEventsObject;
+
+    enum TimerId { TimerId_MouseHover = 1 };
+    static const UINT HoverTimeoutInMs = 1000;
+    static int PrevX = INT_MIN;
+    static int PrevY = INT_MIN;
+    static bool IsMouseOutside = true;
+    static bool IsMouseHovered = false;
+    */
+
+    PAINTSTRUCT ps;
+    HDC dc;
+    RECT rect;
+    int i;
+
     switch(msg){
+    case WM_PAINT:
+        dc = BeginPaint(hwnd, &ps);
+        EndPaint(hwnd, &ps);
+        return 0;
     case WM_CREATE: {
-        HFONT hfDefault;
+        //HFONT hfDefault;
         HWND hEdit;
         HFONT hFont;
 
@@ -382,6 +458,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         tbb[0].fsState = TBSTATE_ENABLED;
         tbb[0].fsStyle = TBSTYLE_BUTTON;
         tbb[0].idCommand = ID_FILE_NEW;
+        //tbb[0].iString = IDS_TIPS_NEW;
+        //SendDlgItemMessage(hwnd, IDS_TIPS_NEW, TB_SETMAXTEXTROWS, 18, 0);
+        //SendDlgItemMessage(hwnd, IDS_TIPS_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
+        //SendDlgItemMessage(hwnd, ID_FILE_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
 
         tbb[1].iBitmap = STD_FILEOPEN;
         tbb[1].fsState = TBSTATE_ENABLED;
@@ -415,10 +495,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
         tbb[7].fsStyle = TBSTYLE_BUTTON;
         tbb[7].idCommand = ID_EDIT_CLEAR;
 
-        //tbb[1].iBitmap = STD_FILEOPEN;
-        //tbb[1].fsState = TBSTATE_ENABLED;
         tbb[8].fsStyle = TBSTYLE_SEP;
-        //tbb[1].idCommand = ID_FILE_OPEN;
 
         tbb[9].iBitmap = STD_UNDO;
         tbb[9].fsState = TBSTATE_ENABLED;
@@ -501,7 +578,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             UpdateWindow(hwnd);
         }
 
-        InvalidateRect(hwnd, NULL, TRUE);
         UpdateWindow(hwnd);
         if(UpdateWindow(hwnd))
         {
@@ -514,8 +590,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             }
             UpdateWindow(hwnd);
         }
+        //InvalidateRect(hwnd, NULL, TRUE);
         break;
     }
+/*
+    case WM_MOUSEMOVE:
+        mouseTrackEventsObject.OnMouseMove(hwnd);
+        return 0;
+    case WM_MOUSELEAVE:
+        mouseTrackEventsObject.Reset(hwnd);
+        return 0;
+    case WM_MOUSEHOVER:
+        SendDlgItemMessage(hwnd, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM)"Create a new file");
+        mouseTrackEventsObject.Reset(hwnd);
+        return 0;
+        */
     case WM_CLOSE: {
         int ret = MessageBox(hwnd, "Are you sure do you want to quit?", "Warning", MB_ICONWARNING | MB_YESNO);
         if(ret == IDYES)
@@ -536,12 +625,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
             //FILE
             case ID_FILE_NEW:
                 SetDlgItemText(hwnd, IDC_MAIN_EDIT, "");
+                //SendDlgItemMessage(hwnd, ID_FILE_NEW, TBSTYLE_TOOLTIPS, 0, (LPARAM)"Create a new file");
+                /*
+                switch(msg)
+                {
+                    case WM_MOUSEMOVE:
+                        mouseTrackEventsObject.OnMouseMove(hwnd);
+                        return 0;
+                    case WM_MOUSELEAVE:
+                        mouseTrackEventsObject.Reset(hwnd);
+                        return 0;
+                    case WM_MOUSEHOVER:
+                        SendDlgItemMessage(hwnd, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM)"Create a new file");
+                        mouseTrackEventsObject.OnMouseMove(hwnd);
+                        return 0;
+                }
+                */
                 break;
             case ID_FILE_OPEN:
                 DoFileOpen(hwnd);
                 break;
             case ID_FILE_SAVE:
-                //RegisterHotKey(hwnd, ID_FILE_SAVE, MOD_CONTROL, 0x53);
                 DoFileSaveOnly(hwnd);
                 break;
             case ID_FILE_SAVEAS:
@@ -569,10 +673,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_PASTE, 0, 0);
                 break;
             case ID_EDIT_SELECTALL:
-                //SendDlgItemMessage(hwnd, IDC_MAIN_EDIT,)
+                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_SETSEL, 0, -1);
+                return 0;
                 break;
             case ID_EDIT_UNDO:
-                SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
+                if(SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, EM_CANUNDO, 0, 0))
+                    SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
                 break;
             case ID_EDIT_REDO:
                 SendDlgItemMessage(hwnd, IDC_MAIN_EDIT, WM_UNDO, 0, 0);
@@ -710,6 +816,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
         break;
     }
+    /*
+    case WM_NOTIFY:{
+        switch(((LPNMHDR)lParam)->code)
+        {
+        case TTN_GETDISPINFO:
+            {
+                LPTOOLTIPTEXT lpttt = (LPTOOLTIPTEXT)lParam;
+
+                lpttt->hinst = g_hinst;
+
+                UINT_PTR idButton = lpttt->hdr.idFrom;
+
+                switch(idButton){
+                case ID_FILE_NEW:
+                    lpttt->lpszText = MAKEINTRESOURCE(IDS_TIPS_NEW);
+                    break;
+                }
+            }
+        }
+    }
+    */
     default:
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }
@@ -719,8 +846,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
     WNDCLASSEX wc;
     HWND hwnd;
+    HWND hwndToolTips;
     MSG Msg;
-    bool ret;
+    //bool ret;
 
     wc.cbSize           =   sizeof(WNDCLASSEX);
     wc.style            =   0;
@@ -755,6 +883,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         MessageBox(hwnd, "Could not create accelerators", "Error", MB_OK | MB_ICONERROR);
         return 0;
+    }
+    HANDLE hIcon = LoadImage(0, _T("img/textPad_icon.ico"), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+    if(hIcon){
+        SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+
+        SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        SendMessage(GetWindow(hwnd, GW_OWNER), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
     }
 
     ShowWindow(hwnd, nCmdShow);
